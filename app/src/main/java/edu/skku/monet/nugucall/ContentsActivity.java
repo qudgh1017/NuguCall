@@ -1,7 +1,9 @@
 package edu.skku.monet.nugucall;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -9,13 +11,41 @@ import org.json.JSONObject;
 
 public class ContentsActivity extends AppCompatActivity {
 
-    String test="6";
+    String imei = "";
+    String phoneNumber = "";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contents);
+        //폰정보 불러오기
+        getPhoneState();
 
-        hasContents();
+
+        // hasContents();
+    }
+
+    public void getPhoneState() {
+
+        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= 26) {
+                imei = tm.getImei();
+
+            } else {
+                imei = tm.getDeviceId();
+
+            }
+            //phoneNumber = tm.getLine1Number();
+            phoneNumber = "01067373845";
+
+            Log.i("TAG", imei+"");
+            Log.i("TAG", phoneNumber+"");
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
     }
 
     public void hasContents() {
