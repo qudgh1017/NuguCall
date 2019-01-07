@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 public class ContentsActivity extends AppCompatActivity {
 
-    String test="";
+    String test="1";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
