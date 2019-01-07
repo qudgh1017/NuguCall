@@ -11,8 +11,8 @@ import org.json.JSONObject;
 
 public class ContentsActivity extends AppCompatActivity {
 
-    String imei = "";
-    String phoneNumber = "";
+    String userIMEI = "";
+    String userPhoneNumber = "";
 
 
     @Override
@@ -32,17 +32,17 @@ public class ContentsActivity extends AppCompatActivity {
 
         try {
             if (android.os.Build.VERSION.SDK_INT >= 26) {
-                imei = tm.getImei();
+                userIMEI = tm.getImei();
 
             } else {
-                imei = tm.getDeviceId();
+                userIMEI = tm.getDeviceId();
 
             }
-            //phoneNumber = tm.getLine1Number();
-            phoneNumber = "01067373845";
+            //userPhoneNumber = tm.getLine1Number();
+            userPhoneNumber = "01067373845";
 
-            Log.i("TAG", imei+"");
-            Log.i("TAG", phoneNumber+"");
+            Log.i("userIMEI", userIMEI+"");
+            Log.i("userPhoneNumber", userPhoneNumber+"");
         } catch (SecurityException e) {
             e.printStackTrace();
         }
@@ -77,10 +77,14 @@ public class ContentsActivity extends AppCompatActivity {
                                         String imei = json.getString("imei");
 
                                         // TODO: 이미 등록된 컨텐츠 정보를 띄우고, 수정 버튼으로 변경
+
+
                                     } else { // 조회된 컨텐츠가 없는 경우
                                         Log.i(Global.TAG, "contents not exist.");
 
                                         // TODO: 새로 컨텐츠를 등록할 수 있게 띄우고, 등록 버튼으로 변경
+
+
                                     }
                                     break;
                                 case "0": // JSP - DB 통신 오류 발생
