@@ -21,6 +21,7 @@ public class ContentsActivity extends AppCompatActivity {
     EditText textName, textText;
     TextView textPhoneNumber, textIMEI;
     Button btn_send, btn_reset;
+    Button btn___;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
