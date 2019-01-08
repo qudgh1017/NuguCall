@@ -23,7 +23,7 @@ public class ContentsActivity extends AppCompatActivity {
     // 서버에 보낼 값, 폰 정보 불러온 값을 보여줄 TextView
     EditText textName, textText;
     TextView textPhoneNumber, textIMEI;
-    Button btn_send, btn_reset;
+    Button btn_send, btn_reset, btn_delete;
 
     //btn_send가 등록인지 수정인지 알기위해 (등록:0, 수정:1)
     int btn_check = 0;
@@ -39,6 +39,7 @@ public class ContentsActivity extends AppCompatActivity {
         textIMEI = (TextView) findViewById(R.id.textIMEI);
         btn_send = (Button) findViewById(R.id.btn_send);
         btn_reset = (Button) findViewById(R.id.btn_reset);
+        btn_delete = (Button) findViewById(R.id.btn_delete);
 
         // 폰정보 불러오기(userIMEI, userPhoneNumber)
         getPhoneState();
@@ -78,6 +79,15 @@ public class ContentsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 textName.setText("");
                 textText.setText("");
+            }
+        });
+
+        // 삭제 버튼 누른 경우 finish()
+        btn_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteContents();
+
             }
         });
     }
@@ -253,7 +263,47 @@ public class ContentsActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
     }
+    public void deleteContents(){
+        Log.i(Global.TAG, "deleteContents() invoked.");
+
+        try {
+            String address = "contents/delete_my_contents.jsp"; // 통신할 JSP 주소
+
+            JSONObject parameter = new JSONObject();
+            parameter.put("imei", userIMEI);
+
+            CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
+                @Override
+                public void callback(String out) {
+                    try {
+                        if(out!=null){// 안드로이드 - JSP 통신 성공
+                            JSONObject json = new JSONObject(out);
+                            String result = json.getString("result");
+
+                            switch (result){
+                                case "1":// JSP - DB 통신 성공
+                                    Toast.makeText(getApplicationContext(), "컨텐츠가 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                    break;
+                                case "0":// JSP - DB 통신 오류 발생
+                                    Toast.makeText(getApplicationContext(), "DB Error Occurred.", Toast.LENGTH_SHORT).show();
+                                    break;
+                            }
+                        }else{// 안드로이드 - JSP 통신 오류 발생
+
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            });
+            communicateDB.execute();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }
+
 
 
 
