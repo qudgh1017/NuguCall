@@ -14,6 +14,8 @@ import org.json.JSONObject;
 
 public class ContentsActivity extends AppCompatActivity {
 
+    // 유병호 학생
+
     String userName="", userText="";
     // 폰 정보 불러온 값을 저장할 변수
     String userIMEI = "", userPhoneNumber = "";

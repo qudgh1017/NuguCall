@@ -6,6 +6,8 @@ import android.os.IBinder;
 
 public class BackgroundService extends Service {
 
+    // 길철휘 학생
+
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
