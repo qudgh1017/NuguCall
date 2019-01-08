@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -19,6 +20,7 @@
             android:textSize="24sp" />
 
         <EditText
+            android:id="@+id/textName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -42,6 +44,7 @@
             android:textSize="24sp" />
 
         <EditText
+            android:id="@+id/textText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -65,7 +68,7 @@
             android:textSize="24sp" />
 
         <TextView
-            android:id="@+id/TextView5"
+            android:id="@+id/textPhoneNumber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -89,7 +92,7 @@
             android:textSize="24sp" />
 
         <TextView
-            android:id="@+id/TextView6"
+            android:id="@+id/textIMEI"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -103,6 +106,19 @@
         android:layout_height="100dp"
         android:orientation="horizontal">
 
+        <Button
+            android:id="@+id/btn_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="등록" />
+
+        <Button
+            android:id="@+id/btn_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="초기화" />
     </LinearLayout>
 
 </LinearLayout>
