@@ -34,25 +34,12 @@ public class ContentsActivity extends AppCompatActivity {
         btn_send = (Button) findViewById(R.id.btn_send);
         btn_reset = (Button) findViewById(R.id.btn_reset);
 
-        // 폰정보 불러오기(userIMEI, userPhoneNumber)
-        getPhoneState();
-
-        // 고객 화면에 보여주기위한 값
-        textPhoneNumber.setText(userPhoneNumber);
-        textIMEI.setText(userIMEI);
-
-        // 고객이 입력한 값 저장
-        userName = textName.getText().toString();
-        userText = textText.getText().toString();
-
-
-
-
-        // hasContents();
+        hasContents();
     }
 
     public void getPhoneState() {
         TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
         try {
             if (android.os.Build.VERSION.SDK_INT >= 26) {
                 userIMEI = tm.getImei();
@@ -71,6 +58,18 @@ public class ContentsActivity extends AppCompatActivity {
 
     public void hasContents() {
         Log.i(Global.TAG, "hasContents() invoked.");
+
+        // 폰정보 불러오기(userIMEI, userPhoneNumber)
+        getPhoneState();
+
+        // 고객 화면에 보여주기위한 값
+        textPhoneNumber.setText(userPhoneNumber);
+        textIMEI.setText(userIMEI);
+
+        // 고객이 입력한 값 저장
+        userName = textName.getText().toString();
+        userText = textText.getText().toString();
+
         try {
             String address = "contents/select_my_contents.jsp"; // 통신할 JSP 주소
 
@@ -99,15 +98,16 @@ public class ContentsActivity extends AppCompatActivity {
                                         String imei = json.getString("imei");
 
                                         // TODO: 이미 등록된 컨텐츠 정보를 띄우고, 수정 버튼으로 변경
+                                        textName.setText(name);
+                                        textText.setText(source);
                                         btn_send.setText("수정");
-
-
 
                                     } else { // 조회된 컨텐츠가 없는 경우
                                         Log.i(Global.TAG, "contents not exist.");
 
                                         // TODO: 새로 컨텐츠를 등록할 수 있게 띄우고, 등록 버튼으로 변경
-                                        btn_send.setText("등록");
+                                        btn_send.setText("등록!!!!");
+
 
 
                                     }
