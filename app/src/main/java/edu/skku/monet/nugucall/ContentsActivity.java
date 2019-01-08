@@ -113,7 +113,7 @@ public class ContentsActivity extends AppCompatActivity {
                                     }
 
                                     //reset 버튼 누른경우????
-                                    
+
                                     break;
                                 case "0": // JSP - DB 통신 오류 발생
                                     Toast.makeText(getApplicationContext(), "DB Error Occurred.", Toast.LENGTH_SHORT).show();
