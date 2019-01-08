@@ -99,15 +99,21 @@ public class ContentsActivity extends AppCompatActivity {
                                         String imei = json.getString("imei");
 
                                         // TODO: 이미 등록된 컨텐츠 정보를 띄우고, 수정 버튼으로 변경
+                                        btn_send.setText("수정");
+
 
 
                                     } else { // 조회된 컨텐츠가 없는 경우
                                         Log.i(Global.TAG, "contents not exist.");
 
                                         // TODO: 새로 컨텐츠를 등록할 수 있게 띄우고, 등록 버튼으로 변경
+                                        btn_send.setText("등록");
 
 
                                     }
+
+                                    //reset 버튼 누른경우????
+                                    
                                     break;
                                 case "0": // JSP - DB 통신 오류 발생
                                     Toast.makeText(getApplicationContext(), "DB Error Occurred.", Toast.LENGTH_SHORT).show();
