@@ -53,8 +53,9 @@ public class ContentsActivity extends AppCompatActivity {
         try {
             String address = "contents/select_my_contents.jsp"; // 통신할 JSP 주소
 
+            //select_my_contents에서 IMEI로 정보 조회
             JSONObject parameter = new JSONObject();
-            parameter.put("imei", "1234567890"); // 매개변수, 값
+            parameter.put("imei", userIMEI+""); // 매개변수, 값
 
             CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
                 @Override
