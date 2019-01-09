@@ -1,22 +1,14 @@
 package edu.skku.monet.nugucall;
-
 /*
     2019.01.09
     by 유병호
     컨텐츠 등록, 수정, 삭제, 초기화, 파일첨부, 문서검색 기능
 */
-
 import android.app.Activity;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -27,6 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONObject;
+
+import java.io.File;
 
 public class ContentsActivity extends AppCompatActivity {
 
@@ -40,7 +34,11 @@ public class ContentsActivity extends AppCompatActivity {
     EditText textName, textText;
     TextView textPhoneNumber, textIMEI, textSource;
     Button btn_send, btn_reset, btn_delete, btn_fileUpload;
-    FilePath filePathClass = new FilePath();
+
+    // 클래스 생성
+    ContentsFilePath contentsFilePath = new ContentsFilePath();
+    // 생성자 넣어야함!!!!! filepath
+    // ContentsFileUpload contentsFileUpload = new ContentsFileUpload();
 
     //btn_send가 등록인지 수정인지 알기위해 (등록:0, 수정:1)
     int btn_check = 0;
@@ -329,7 +327,7 @@ public class ContentsActivity extends AppCompatActivity {
                                     break;
                             }
                         } else {// 안드로이드 - JSP 통신 오류 발생
-
+                            Toast.makeText(getApplicationContext(), "JSP Error Occurred.", Toast.LENGTH_SHORT).show();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -378,10 +376,13 @@ public class ContentsActivity extends AppCompatActivity {
             if (resultData != null) {
                 uri = resultData.getData();
                 Log.i(Global.TAG,"Uri: " + uri.getPath());
-                Log.i(Global.TAG,"Path: " + filePathClass.getPath(getApplicationContext(), uri));
+                Log.i(Global.TAG,"Path: " + contentsFilePath.getPath(getApplicationContext(), uri));
+
+                //파일이름 얻는법~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+               // File file = new File(contentsFilePath.getPath(getApplicationContext(), uri));
 
                 // filePath 얻어서 파일명.확장자 고객화면에 보여주기
-                String filePath = filePathClass.getPath(getApplicationContext(), uri);
+                String filePath = contentsFilePath.getPath(getApplicationContext(), uri);
                 String[] splitFilePath = filePath.split("/");
                 userSource = splitFilePath[splitFilePath.length-1];
                 textSource.setText(userSource);

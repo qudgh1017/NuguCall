@@ -17,7 +17,7 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
 
-public class FilePath {
+public class ContentsFilePath {
 
     // 유병호
     // URI에서 file path 가져오기 관련코드 1
