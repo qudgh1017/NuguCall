@@ -4,7 +4,6 @@ package edu.skku.monet.nugucall;
     by 유병호
     컨텐츠 등록, 수정, 삭제, 초기화, 파일첨부, 문서검색 기능
 */
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -25,7 +24,6 @@ import java.io.File;
 
 public class ContentsActivity extends AppCompatActivity {
 
-    // 유병호 학생
     // 문서 제공자 검색하기 위한 CODE
     public static final int READ_REQUEST_CODE = 42;
     String userName = "", userText = "", userSource = "";
@@ -84,7 +82,7 @@ public class ContentsActivity extends AppCompatActivity {
                     // contents 업로드할 때 쓰는 contentsFileUpload 클래스 생성
                     ContentsFileUpload contentsFileUpload = new ContentsFileUpload(filePath);
 
-                    // contents 먼저 등록
+                    // ContentsDB 등록하기 전 먼저 파일을 서버에 보내기
                     //contentsFileUpload.fileUpload();
 
                     // contents 업로드 성공하면 등록 또는 수정
@@ -351,7 +349,6 @@ public class ContentsActivity extends AppCompatActivity {
 
     // 문서 제공자 검색을 위한 함수1 (안드로이드 Developers의 Core topics - App data & files - Content Providers - Open files using storage access framework)
     public void performFileSearch() {
-
         // 앱이 ACTION_OPEN_DOCUMENT 인텐트를 실행시키면 이는 일치하는 문서 제공자를 모두 표시하는 선택기를 시작합니다.
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 
@@ -386,10 +383,6 @@ public class ContentsActivity extends AppCompatActivity {
                 uri = resultData.getData();
                 Log.i(Global.TAG, "Uri: " + uri.getPath());
                 Log.i(Global.TAG, "Path: " + contentsFilePath.getPath(getApplicationContext(), uri));
-
-                //파일이름 얻는법~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                //File file = new File(filePath);
-
 
                 // filePath
                 filePath = contentsFilePath.getPath(getApplicationContext(), uri);
