@@ -16,7 +16,6 @@ import org.json.JSONObject;
 public class ContentsActivity extends AppCompatActivity {
 
     // 유병호 학생
-
     String userName = "", userText = "";
     // 폰 정보 불러온 값을 저장할 변수
     String userIMEI = "", userPhoneNumber = "";
@@ -87,7 +86,6 @@ public class ContentsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 deleteContents();
-
             }
         });
     }
@@ -101,8 +99,10 @@ public class ContentsActivity extends AppCompatActivity {
             } else {
                 userIMEI = tm.getDeviceId();
             }
-            //userPhoneNumber = tm.getLine1Number();
-            userPhoneNumber = "01067373845"; //임의로 설정(USIM 없어서)
+            userPhoneNumber = tm.getLine1Number();
+            //userPhoneNumber = "+821067373845"; //임의로 설정(USIM 없어서)
+            //+82를 0으로 바꿔주기
+            userPhoneNumber = userPhoneNumber.replace("+82", "0");
 
             Log.i("userIMEI", userIMEI + "");
             Log.i("userPhoneNumber", userPhoneNumber + "");
@@ -116,7 +116,6 @@ public class ContentsActivity extends AppCompatActivity {
 
         try {
             String address = "contents/select_my_contents.jsp"; // 통신할 JSP 주소
-
             //select_my_contents에서 IMEI로 정보 조회
             JSONObject parameter = new JSONObject();
             parameter.put("imei", userIMEI + ""); // 매개변수, 값
@@ -153,6 +152,7 @@ public class ContentsActivity extends AppCompatActivity {
                                         // TODO: 새로 컨텐츠를 등록할 수 있게 띄우고, 등록 버튼으로 변경
                                         btn_check = 0;
                                         btn_send.setText("등록");
+                                        btn_delete.setVisibility(View.GONE); //
                                         //textName.setText("");
                                         //textText.setText("");
                                     }
@@ -200,7 +200,10 @@ public class ContentsActivity extends AppCompatActivity {
                                 case "1" :// JSP - DB 통신 성공
                                     Toast.makeText(getApplicationContext(), "컨텐츠가 등록되었습니다.", Toast.LENGTH_SHORT).show();
 
-                                    btn_check = 1; //등록되면 수정으로 바꿔주고
+                                    //등록되면 수정으로 바꿔주고 삭제버튼 보이게
+                                    btn_check = 1;
+                                    btn_send.setText("수정");
+                                    btn_delete.setVisibility(View.VISIBLE);
                                     break;
 
                                 case "0": // JSP - DB 통신 오류 발생
@@ -263,6 +266,7 @@ public class ContentsActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
     }
+
     public void deleteContents(){
         Log.i(Global.TAG, "deleteContents() invoked.");
 
@@ -283,6 +287,7 @@ public class ContentsActivity extends AppCompatActivity {
                             switch (result){
                                 case "1":// JSP - DB 통신 성공
                                     Toast.makeText(getApplicationContext(), "컨텐츠가 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                                    btn_check = 0;
                                     finish();
                                     break;
                                 case "0":// JSP - DB 통신 오류 발생
