@@ -1,5 +1,11 @@
 package edu.skku.monet.nugucall;
 
+/*
+    2019.01.09
+    by 유병호
+    컨텐츠 등록, 수정, 삭제, 초기화, 파일첨부, 문서검색 기능
+*/
+
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
@@ -34,6 +40,7 @@ public class ContentsActivity extends AppCompatActivity {
     EditText textName, textText;
     TextView textPhoneNumber, textIMEI, textSource;
     Button btn_send, btn_reset, btn_delete, btn_fileUpload;
+    FilePath filePathClass = new FilePath();
 
     //btn_send가 등록인지 수정인지 알기위해 (등록:0, 수정:1)
     int btn_check = 0;
@@ -76,9 +83,9 @@ public class ContentsActivity extends AppCompatActivity {
                     userText = textText.getText().toString();
                     userSource = textSource.getText().toString();
 
-                    if(btn_check==0){ // 등록 버튼일 경우
+                    if (btn_check == 0) { // 등록 버튼일 경우
                         insertContents();
-                    }else if(btn_check==1){// 수정 버튼일 경우
+                    } else if (btn_check == 1) {// 수정 버튼일 경우
                         updateContents();
                     }
                 }
@@ -201,7 +208,7 @@ public class ContentsActivity extends AppCompatActivity {
         }
     }
 
-    public void insertContents(){
+    public void insertContents() {
         Log.i(Global.TAG, "insertContents() invoked.");
 
         try {
@@ -217,13 +224,13 @@ public class ContentsActivity extends AppCompatActivity {
             CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
                 @Override
                 public void callback(String out) {
-                    try{
+                    try {
                         if (out != null) { // 안드로이드 - JSP 통신 성공
                             JSONObject json = new JSONObject(out);
                             String result = json.getString("result");
 
-                            switch (result){
-                                case "1" :// JSP - DB 통신 성공
+                            switch (result) {
+                                case "1":// JSP - DB 통신 성공
                                     Toast.makeText(getApplicationContext(), "컨텐츠가 등록되었습니다.", Toast.LENGTH_SHORT).show();
 
                                     //등록되면 수정으로 바꿔주고 삭제버튼 보이게
@@ -236,65 +243,65 @@ public class ContentsActivity extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(), "DB Error Occurred.", Toast.LENGTH_SHORT).show();
                                     break;
                             }
-                        }else { // 안드로이드 - JSP 통신 오류 발생
+                        } else { // 안드로이드 - JSP 통신 오류 발생
                             Toast.makeText(getApplicationContext(), "JSP Error Occurred.", Toast.LENGTH_SHORT).show();
                         }
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             });
             communicateDB.execute();
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void updateContents(){
-            Log.i(Global.TAG, "updateContents() invoked.");
+    public void updateContents() {
+        Log.i(Global.TAG, "updateContents() invoked.");
 
-            try {
-                String address = "contents/update_my_contents.jsp"; // 통신할 JSP 주소
+        try {
+            String address = "contents/update_my_contents.jsp"; // 통신할 JSP 주소
 
-                JSONObject parameter = new JSONObject();
-                parameter.put("name", userName);
-                parameter.put("phone", userPhoneNumber);
-                parameter.put("text", userText);
-                parameter.put("source", userSource);
-                parameter.put("imei", userIMEI);
+            JSONObject parameter = new JSONObject();
+            parameter.put("name", userName);
+            parameter.put("phone", userPhoneNumber);
+            parameter.put("text", userText);
+            parameter.put("source", userSource);
+            parameter.put("imei", userIMEI);
 
-                CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
-                    @Override
-                    public void callback(String out) {
-                        try{
-                            if (out != null) { // 안드로이드 - JSP 통신 성공
-                                JSONObject json = new JSONObject(out);
-                                String result = json.getString("result");
+            CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
+                @Override
+                public void callback(String out) {
+                    try {
+                        if (out != null) { // 안드로이드 - JSP 통신 성공
+                            JSONObject json = new JSONObject(out);
+                            String result = json.getString("result");
 
-                                switch (result){
-                                    case "1" :// JSP - DB 통신 성공
-                                        Toast.makeText(getApplicationContext(), "컨텐츠가 수정되었습니다.", Toast.LENGTH_SHORT).show();
-                                        break;
+                            switch (result) {
+                                case "1":// JSP - DB 통신 성공
+                                    Toast.makeText(getApplicationContext(), "컨텐츠가 수정되었습니다.", Toast.LENGTH_SHORT).show();
+                                    break;
 
-                                    case "0": // JSP - DB 통신 오류 발생
-                                        Toast.makeText(getApplicationContext(), "DB Error Occurred.", Toast.LENGTH_SHORT).show();
-                                        break;
-                                }
-                            }else { // 안드로이드 - JSP 통신 오류 발생
-                                Toast.makeText(getApplicationContext(), "JSP Error Occurred.", Toast.LENGTH_SHORT).show();
+                                case "0": // JSP - DB 통신 오류 발생
+                                    Toast.makeText(getApplicationContext(), "DB Error Occurred.", Toast.LENGTH_SHORT).show();
+                                    break;
                             }
-                        }catch (Exception e){
-                            e.printStackTrace();
+                        } else { // 안드로이드 - JSP 통신 오류 발생
+                            Toast.makeText(getApplicationContext(), "JSP Error Occurred.", Toast.LENGTH_SHORT).show();
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                });
-                communicateDB.execute();
-            }catch(Exception e){
-                e.printStackTrace();
-            }
+                }
+            });
+            communicateDB.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public void deleteContents(){
+    public void deleteContents() {
         Log.i(Global.TAG, "deleteContents() invoked.");
 
         try {
@@ -307,11 +314,11 @@ public class ContentsActivity extends AppCompatActivity {
                 @Override
                 public void callback(String out) {
                     try {
-                        if(out!=null){// 안드로이드 - JSP 통신 성공
+                        if (out != null) {// 안드로이드 - JSP 통신 성공
                             JSONObject json = new JSONObject(out);
                             String result = json.getString("result");
 
-                            switch (result){
+                            switch (result) {
                                 case "1":// JSP - DB 통신 성공
                                     Toast.makeText(getApplicationContext(), "컨텐츠가 삭제되었습니다.", Toast.LENGTH_SHORT).show();
                                     btn_check = 0;
@@ -321,20 +328,20 @@ public class ContentsActivity extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(), "DB Error Occurred.", Toast.LENGTH_SHORT).show();
                                     break;
                             }
-                        }else{// 안드로이드 - JSP 통신 오류 발생
+                        } else {// 안드로이드 - JSP 통신 오류 발생
 
                         }
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             });
             communicateDB.execute();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-    }
 
+    }
     // 문서 제공자 검색을 위한 함수1 (안드로이드 Developers의 Core topics - App data & files - Content Providers - Open files using storage access framework)
     public void performFileSearch() {
 
@@ -371,10 +378,10 @@ public class ContentsActivity extends AppCompatActivity {
             if (resultData != null) {
                 uri = resultData.getData();
                 Log.i(Global.TAG,"Uri: " + uri.getPath());
-                Log.i(Global.TAG,"Path: " + getPath(getApplicationContext(), uri));
+                Log.i(Global.TAG,"Path: " + filePathClass.getPath(getApplicationContext(), uri));
 
                 // filePath 얻어서 파일명.확장자 고객화면에 보여주기
-                String filePath = getPath(getApplicationContext(), uri);
+                String filePath = filePathClass.getPath(getApplicationContext(), uri);
                 String[] splitFilePath = filePath.split("/");
                 userSource = splitFilePath[splitFilePath.length-1];
                 textSource.setText(userSource);
@@ -382,87 +389,8 @@ public class ContentsActivity extends AppCompatActivity {
         }
     }
 
-    // URI에서 file path 가져오기 관련코드 1
-    public static String getPath(final Context context, final Uri uri) {
-
-        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
-            if (isExternalStorageDocument(uri)) {
-                final String docId = DocumentsContract.getDocumentId(uri);
-                final String[] split = docId.split(":");
-                final String type = split[0];
-                if ("primary".equalsIgnoreCase(type)) {
-                    return Environment.getExternalStorageDirectory() + "/" + split[1];
-                }
-            }
-            else if (isDownloadsDocument(uri)) {
-                final String id = DocumentsContract.getDocumentId(uri);
-                final Uri contentUri = ContentUris.withAppendedId(
-                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
-                return getDataColumn(context, contentUri, null, null);
-            }
-            // MediaProvider
-            else if (isMediaDocument(uri)) {
-                final String docId = DocumentsContract.getDocumentId(uri);
-                final String[] split = docId.split(":");
-                final String type = split[0];
-
-                Uri contentUri = null;
-                if ("image".equals(type)) {
-                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                } else if ("video".equals(type)) {
-                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-                }
-
-                final String selection = "_id=?";
-                final String[] selectionArgs = new String[] {
-                        split[1]
-                };
-                return getDataColumn(context, contentUri, selection, selectionArgs);
-            }
-        }
-        else if ("content".equalsIgnoreCase(uri.getScheme())) {
-            return getDataColumn(context, uri, null, null);
-        }
-        else if ("file".equalsIgnoreCase(uri.getScheme())) {
-            return uri.getPath();
-        }
-
-        return null;
-    }
-    // URI에서 file path 가져오기 관련코드 2
-    public static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
-        Cursor cursor = null;
-        final String column = "_data";
-        final String[] projection = {column};
-        try {
-            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
-                    null);
-            if (cursor != null && cursor.moveToFirst()) {
-                final int column_index = cursor.getColumnIndexOrThrow(column);
-                return cursor.getString(column_index);
-            }
-        } finally {
-            if (cursor != null)
-                cursor.close();
-        }
-        return null;
-    }
-    // URI에서 file path 가져오기 관련코드 3
-    public static boolean isExternalStorageDocument(Uri uri) {
-        return "com.android.externalstorage.documents".equals(uri.getAuthority());
-    }
-    // URI에서 file path 가져오기 관련코드 4
-    public static boolean isDownloadsDocument(Uri uri) {
-        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
-    }
-    // URI에서 file path 가져오기 관련코드 5
-    public static boolean isMediaDocument(Uri uri) {
-        return "com.android.providers.media.documents".equals(uri.getAuthority());
-    }
-
-
 }
+
 
 
 
