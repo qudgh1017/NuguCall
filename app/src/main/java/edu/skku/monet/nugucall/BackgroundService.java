@@ -1,30 +1,37 @@
 package edu.skku.monet.nugucall;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
-import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 
 public class BackgroundService extends Service {
 
-    // 길철휘 학생
+    private Handler handler;
 
-    // Binder given to clients
-    private final IBinder mBinder = new LocalBinder();
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
 
-    /**
-     * Class used for the client Binder.  Because we know this service always
-     * runs in the same process as its clients, we don't need to deal with IPC.
-     */
-    public class LocalBinder extends Binder {
-        BackgroundService getService() {
-            // Return this instance of BackgroundService so clients can call public methods
-            return BackgroundService.this;
-        }
+        handler = new Handler();
+
+        setNotification();
+        setWindowLayout();
+
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    public void setNotification() {
+        Notification.Builder builder = new Notification.Builder(getApplicationContext());
+
+    }
+
+    public void setWindowLayout() {
+
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        return mBinder;
+        return null;
     }
 }
