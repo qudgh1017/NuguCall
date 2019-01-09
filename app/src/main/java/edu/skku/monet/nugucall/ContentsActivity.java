@@ -4,6 +4,7 @@ package edu.skku.monet.nugucall;
     by 유병호
     컨텐츠 등록, 수정, 삭제, 초기화, 파일첨부, 문서검색 기능
 */
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +31,7 @@ public class ContentsActivity extends AppCompatActivity {
     String userName = "", userText = "", userSource = "";
     // 폰 정보 불러온 값을 저장할 변수
     String userIMEI = "", userPhoneNumber = "";
+    String filePath = "";
     // 서버에 보낼 값, 폰 정보 불러온 값을 보여줄 TextView
     EditText textName, textText;
     TextView textPhoneNumber, textIMEI, textSource;
@@ -37,8 +39,6 @@ public class ContentsActivity extends AppCompatActivity {
 
     // 클래스 생성
     ContentsFilePath contentsFilePath = new ContentsFilePath();
-    // 생성자 넣어야함!!!!! filepath
-    // ContentsFileUpload contentsFileUpload = new ContentsFileUpload();
 
     //btn_send가 등록인지 수정인지 알기위해 (등록:0, 수정:1)
     int btn_check = 0;
@@ -80,6 +80,14 @@ public class ContentsActivity extends AppCompatActivity {
                     userName = textName.getText().toString();
                     userText = textText.getText().toString();
                     userSource = textSource.getText().toString();
+
+                    // contents 업로드할 때 쓰는 contentsFileUpload 클래스 생성
+                    ContentsFileUpload contentsFileUpload = new ContentsFileUpload(filePath);
+
+                    // contents 먼저 등록
+                    //contentsFileUpload.fileUpload();
+
+                    // contents 업로드 성공하면 등록 또는 수정
 
                     if (btn_check == 0) { // 등록 버튼일 경우
                         insertContents();
@@ -340,6 +348,7 @@ public class ContentsActivity extends AppCompatActivity {
         }
 
     }
+
     // 문서 제공자 검색을 위한 함수1 (안드로이드 Developers의 Core topics - App data & files - Content Providers - Open files using storage access framework)
     public void performFileSearch() {
 
@@ -375,25 +384,25 @@ public class ContentsActivity extends AppCompatActivity {
             Uri uri = null;
             if (resultData != null) {
                 uri = resultData.getData();
-                Log.i(Global.TAG,"Uri: " + uri.getPath());
-                Log.i(Global.TAG,"Path: " + contentsFilePath.getPath(getApplicationContext(), uri));
+                Log.i(Global.TAG, "Uri: " + uri.getPath());
+                Log.i(Global.TAG, "Path: " + contentsFilePath.getPath(getApplicationContext(), uri));
 
                 //파일이름 얻는법~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-               // File file = new File(contentsFilePath.getPath(getApplicationContext(), uri));
+                //File file = new File(filePath);
 
-                // filePath 얻어서 파일명.확장자 고객화면에 보여주기
-                String filePath = contentsFilePath.getPath(getApplicationContext(), uri);
+
+                // filePath
+                filePath = contentsFilePath.getPath(getApplicationContext(), uri);
+
+                //filePath(/storage/emulated/0/Movies/)를 변경해서 파일명.확장자 고객화면에 보여주기
                 String[] splitFilePath = filePath.split("/");
-                userSource = splitFilePath[splitFilePath.length-1];
+                userSource = splitFilePath[splitFilePath.length - 1];
                 textSource.setText(userSource);
             }
         }
     }
 
 }
-
-
-
 
 
 //추가할 것

@@ -4,6 +4,10 @@ package edu.skku.monet.nugucall;
     by 유병호
     소켓 통신으로 이미지 또는 동영상 서버에 올리기
 */
+import android.util.Log;
+
+import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -31,13 +35,13 @@ public class ContentsFileUpload {
         this.filePath = filePath;
     }
 
-    public void connect() {
-        ConnectThread connectThread = new ConnectThread();
-        connectThread.start();
+    public void fileUpload() {
+        FileUploadThread fileUploadThread = new FileUploadThread();
+        fileUploadThread.start();
     }
 
-    //connect 이름 바꾸기 fileUploadThread~~~~~~~~~~~~~~~~~~~~~~~
-    private class ConnectThread extends Thread {
+    // 파일 업로드 스레드
+    private class FileUploadThread extends Thread {
         @Override
         public void run() {
             try {
@@ -59,7 +63,6 @@ public class ContentsFileUpload {
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
                 // 문자열 속도 개선
                 printWriter = new PrintWriter(outputStreamWriter);
-
                 // Byte(파일) 발신기능(+속도개선)
                 bufferedOutputStream = new BufferedOutputStream(outputStream);
 
@@ -72,12 +75,54 @@ public class ContentsFileUpload {
                 // Byte(파일) 수신기능(+속도개선)
                 // bufferedInputStream = new BufferedInputStream(inputStream);
 
-                file.getName();
+                String fileName = file.getName();
+                long fileSize = file.length();
+
+                // 1. 보내려는 파일 이름과 파일 크기 JSONObject에 담아서 PrintWriter(문자열)로 서버에 보내기
+                JSONObject parameter = new JSONObject();
+                parameter.put("fileName", fileName);
+                parameter.put("fileSize", fileSize);
+                printWriter.print(parameter.toString());
+                printWriter.flush();
+                Log.i(Global.TAG, "fileName: " + fileName);
+                Log.i(Global.TAG, " fileSize: "+fileSize);
+
+                // 2. BufferedReader를 통해 서버에서 올 문자열 답변에 대기(readLine()) => 답변으로 "(년월일시분초).확장자" => ContentsDB의 source에 입력될 문자열
+                String message = bufferedReader.readLine();
+                Log.i(Global.TAG, "message: " + message);
+
+                // 3. BufferedInputStream을 통해 파일을 읽음과 동시에 BufferedOutPutStream을 통해 파일을 서버로 전송
+                byte[] buffer = new byte[65536];
+                long check = 0;
+                while(check != fileSize){
+                    int length = bufferedInputStream.read(buffer);
+                    bufferedOutputStream.write(buffer, 0, length);
+                    check += length;
+                    Log.i(Global.TAG, ""+length);
+                }
+
+                // flush, close
+
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
+
+
+    /* ContentsFileDownload class 하나 더 만들기
+    public void fileDownload() {
+        FileDownloadThread fileDownloadThread = new FileDownloadThread();
+        fileDownloadThread.start();
+    }
+
+    // 파일 다운로드 스레드
+    private class FileDownloadThread extends Thread {
+        @Override
+        public void run() {
+
+        }
+    }*/
 
 }
