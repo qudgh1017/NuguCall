@@ -42,9 +42,10 @@ public class ContentsActivity extends AppCompatActivity {
     //btn_send가 등록인지 수정인지 알기위해 (등록:0, 수정:1)
     int btn_check = 0;
 
-    // ContentsFileUpload 클래스에 있는 ThreadReceive 인터페이스 생성
+    // TODO: 1. ContentsFileUpload 클래스에 있는 ThreadReceive 인터페이스 생성 및 정의
     ContentsFileUpload.ThreadReceive threadReceive = new ContentsFileUpload.ThreadReceive() {
-
+        // onReceiveRun 함수 정의
+        // TODO: 4. onReceiveRun 함수 실행
         @Override
         public void onReceiveRun(String message) {
             userSource = message;
@@ -96,10 +97,13 @@ public class ContentsActivity extends AppCompatActivity {
                     userSource = textSource.getText().toString();
 
                     // contents 업로드할 때 쓰는 contentsFileUpload 클래스 생성
+                    // TODO: 2. 생성자에 threadReceive 인터페이스를 변수로 보냄
                     ContentsFileUpload contentsFileUpload = new ContentsFileUpload(threadReceive, filePath);
 
                     // ContentsDB 등록하기 전 먼저 파일을 서버에 보내기, fileUpload 함수에서 실행하는 fileUploadThread에서 서버와 데이터를 주고받은 후
-                    // threadReceive.onReceiveRun(message) 실행
+                    // insertContents()와 updateContents()함수를 실행하는 threadReceive.onReceiveRun(message)를 실행
+                    // => fileUploadThread와 메인스레드가 동시에 작업을 하므로 파일이 업로드되기 전 등록 또는 수정이 될 수 있어서
+                    // 순차적으로 작업을 하기위해 onReceive 스레드함수에 메인스레드에서 실행할 작업을 정의하고 호출함
                     contentsFileUpload.fileUpload();
 
                 }
@@ -403,8 +407,3 @@ public class ContentsActivity extends AppCompatActivity {
         }
     }
 }
-
-
-//추가할 것
-//파일 탐색해서 사진 또는 동영상 올리는 기능 추가해야함.
-//사진 또는 동영상 보내는 기능 추가해야함
