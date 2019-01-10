@@ -19,9 +19,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.io.File;
 
 public class ContentsActivity extends AppCompatActivity {
 
@@ -162,7 +161,7 @@ public class ContentsActivity extends AppCompatActivity {
         Log.i(Global.TAG, "hasContents() invoked.");
 
         try {
-            String address = "contents/select_my_contents.jsp"; // 통신할 JSP 주소
+            String address = "select_my_contents"; // 통신할 JSP 주소
             //select_my_contents에서 IMEI로 정보 조회
             JSONObject parameter = new JSONObject();
             parameter.put("imei", userIMEI + ""); // 매개변수, 값
@@ -172,21 +171,22 @@ public class ContentsActivity extends AppCompatActivity {
                 public void callback(String out) {
                     try {
                         if (out != null) { // 안드로이드 - JSP 통신 성공
-                            JSONObject json = new JSONObject(out);
-                            String result = json.getString("result"); // 반환 값
+                            JSONObject jsonObject = new JSONObject(out);
+                            String result = jsonObject.getString("result"); // 반환 값
 
                             switch (result) {
                                 case "1": // JSP - DB 통신 성공
-                                    json = json.getJSONObject("item");
-                                    if (json.length() > 0) { // 조회된 컨텐츠가 있는 경우
+                                    JSONArray jsonArray = jsonObject.getJSONArray("items");
+
+                                    if (jsonArray.length() > 0) {
                                         Log.i(Global.TAG, "contents exist.");
 
-                                        String id = json.getString("id");
-                                        String name = json.getString("name");
-                                        String phone = json.getString("phone");
-                                        String text = json.getString("text");
-                                        String source = json.getString("source");
-                                        String imei = json.getString("imei");
+                                        String id = jsonArray.getJSONObject(0).getString("id");
+                                        String name = jsonArray.getJSONObject(0).getString("name");
+                                        String phone = jsonArray.getJSONObject(0).getString("phone");
+                                        String text = jsonArray.getJSONObject(0).getString("text");
+                                        String source = jsonArray.getJSONObject(0).getString("source");
+                                        String imei = jsonArray.getJSONObject(0).getString("imei");
 
                                         // TODO: 이미 등록된 컨텐츠 정보를 띄우고, 수정 버튼으로 변경
                                         btn_check = 1;
@@ -194,15 +194,13 @@ public class ContentsActivity extends AppCompatActivity {
                                         textName.setText(name);
                                         textText.setText(text);
                                         textSource.setText(source);
-
-                                    } else { // 조회된 컨텐츠가 없는 경우
+                                    } else {
                                         Log.i(Global.TAG, "contents not exist.");
 
                                         // TODO: 새로 컨텐츠를 등록할 수 있게 띄우고, 등록 버튼으로 변경
                                         btn_check = 0;
                                         btn_send.setText("등록");
-                                        btn_delete.setVisibility(View.GONE); //
-
+                                        btn_delete.setVisibility(View.GONE);
                                     }
                                     break;
 
@@ -228,7 +226,7 @@ public class ContentsActivity extends AppCompatActivity {
         Log.i(Global.TAG, "insertContents() invoked.");
 
         try {
-            String address = "contents/insert_my_contents.jsp"; // 통신할 JSP 주소
+            String address = "insert_my_contents"; // 통신할 JSP 주소
 
             JSONObject parameter = new JSONObject();
             parameter.put("name", userName);
@@ -277,7 +275,7 @@ public class ContentsActivity extends AppCompatActivity {
         Log.i(Global.TAG, "updateContents() invoked.");
 
         try {
-            String address = "contents/update_my_contents.jsp"; // 통신할 JSP 주소
+            String address = "update_my_contents"; // 통신할 JSP 주소
 
             JSONObject parameter = new JSONObject();
             parameter.put("name", userName);
@@ -321,7 +319,7 @@ public class ContentsActivity extends AppCompatActivity {
         Log.i(Global.TAG, "deleteContents() invoked.");
 
         try {
-            String address = "contents/delete_my_contents.jsp"; // 통신할 JSP 주소
+            String address = "delete_my_contents"; // 통신할 JSP 주소
 
             JSONObject parameter = new JSONObject();
             parameter.put("imei", userIMEI);

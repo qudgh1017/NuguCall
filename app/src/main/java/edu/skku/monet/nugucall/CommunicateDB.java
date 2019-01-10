@@ -12,11 +12,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Iterator;
 
 public class CommunicateDB extends AsyncTask<Void, Void, String> {
 
-    private String address; // "폴더/JSP"
+    private String address; // 주소
     private JSONObject parameter; // JSON 매개변수
     private CallbackDB callbackDB; // 콜백함수
 
@@ -39,19 +38,11 @@ public class CommunicateDB extends AsyncTask<Void, Void, String> {
             httpURLConnection.setDefaultUseCaches(false);
 
             if (parameter != null) {
-                // JSON을 URL 매개변수로 변경
-                StringBuilder stringBuilder = new StringBuilder();
-                Iterator<String> iterator = parameter.keys();
-                while (iterator.hasNext()) {
-                    String key = iterator.next();
-                    String str = "&" + key + "=" + parameter.getString(key);
-                    stringBuilder.append(str);
-                }
-                // URL 매개변수 전송
+                // JSON을 매개변수로 전송
                 OutputStream outputStream = httpURLConnection.getOutputStream();
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
                 BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
-                bufferedWriter.write(stringBuilder.substring(1));
+                bufferedWriter.write(parameter.toString(1));
                 bufferedWriter.flush();
                 bufferedWriter.close();
             }
@@ -84,3 +75,12 @@ public class CommunicateDB extends AsyncTask<Void, Void, String> {
         callbackDB.callback(out);
     }
 }
+
+// JSON을 URL 매개변수로 변경
+// StringBuilder stringBuilder = new StringBuilder();
+// Iterator<String> iterator = parameter.keys();
+// while (iterator.hasNext()) {
+// String key = iterator.next();
+// String str = "&" + key + "=" + parameter.getString(key);
+// stringBuilder.append(str);
+// }
