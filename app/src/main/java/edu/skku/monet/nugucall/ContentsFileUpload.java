@@ -35,6 +35,7 @@ public class ContentsFileUpload {
     public interface ThreadReceive {
         public void onReceiveRun(String message);
     }
+
     private ThreadReceive threadReceive;
 
     ContentsFileUpload(ThreadReceive threadReceive, String filePath) {
