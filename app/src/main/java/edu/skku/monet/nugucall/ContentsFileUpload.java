@@ -6,9 +6,7 @@ package edu.skku.monet.nugucall;
 */
 
 import android.util.Log;
-
 import org.json.JSONObject;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -32,12 +30,14 @@ public class ContentsFileUpload {
     private BufferedInputStream bufferedInputStream; //바이트 수신
     private String filePath;
 
+    // ThreadReceive 인터페이스 선언
     public interface ThreadReceive {
         public void onReceiveRun(String message);
     }
 
     private ThreadReceive threadReceive;
 
+    // 생성자
     ContentsFileUpload(ThreadReceive threadReceive, String filePath) {
         this.threadReceive = threadReceive;
         this.filePath = filePath;
@@ -118,7 +118,7 @@ public class ContentsFileUpload {
                 printWriter.close();
                 socket.close();
 
-
+                // TODO: 3. contentsActivity.java의 onReceive 함수 호출(컨텐츠 등록 또는 수정하는 기능)
                 threadReceive.onReceiveRun(message);
 
             } catch (Exception e) {
