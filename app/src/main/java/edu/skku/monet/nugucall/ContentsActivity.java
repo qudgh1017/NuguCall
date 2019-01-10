@@ -5,6 +5,7 @@ package edu.skku.monet.nugucall;
     컨텐츠 등록, 수정, 삭제, 초기화, 파일첨부, 문서검색 기능
 */
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -35,14 +36,11 @@ public class ContentsActivity extends AppCompatActivity {
     TextView textPhoneNumber, textIMEI, textSource;
     Button btn_send, btn_reset, btn_delete, btn_fileUpload;
 
-    // 클래스 생성
-    ContentsFilePath contentsFilePath = new ContentsFilePath();
-
     //btn_send가 등록인지 수정인지 알기위해 (등록:0, 수정:1)
     int btn_check = 0;
 
     // TODO: 1. ContentsFileUpload 클래스에 있는 ThreadReceive 인터페이스 생성 및 정의
-    ContentsFileUpload.ThreadReceive threadReceive = new ContentsFileUpload.ThreadReceive() {
+    ThreadReceive threadReceive = new ThreadReceive() {
         // onReceiveRun 함수 정의
         // TODO: 4. onReceiveRun 함수 실행
         @Override
@@ -62,15 +60,15 @@ public class ContentsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contents);
 
-        textName = (EditText) findViewById(R.id.textName);
-        textText = (EditText) findViewById(R.id.textText);
-        textSource = (TextView) findViewById(R.id.textSource);
-        textPhoneNumber = (TextView) findViewById(R.id.textPhoneNumber);
-        textIMEI = (TextView) findViewById(R.id.textIMEI);
-        btn_send = (Button) findViewById(R.id.btn_send);
-        btn_reset = (Button) findViewById(R.id.btn_reset);
-        btn_delete = (Button) findViewById(R.id.btn_delete);
-        btn_fileUpload = (Button) findViewById(R.id.btn_fileUpload);
+        textName = findViewById(R.id.textName);
+        textText = findViewById(R.id.textText);
+        textSource = findViewById(R.id.textSource);
+        textPhoneNumber = findViewById(R.id.textPhoneNumber);
+        textIMEI = findViewById(R.id.textIMEI);
+        btn_send = findViewById(R.id.btn_send);
+        btn_reset = findViewById(R.id.btn_reset);
+        btn_delete = findViewById(R.id.btn_delete);
+        btn_fileUpload = findViewById(R.id.btn_fileUpload);
 
         // 폰정보 불러오기(userIMEI, userPhoneNumber)
         getPhoneState();
@@ -136,6 +134,7 @@ public class ContentsActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("HardwareIds")
     public void getPhoneState() {
         TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 
@@ -181,12 +180,12 @@ public class ContentsActivity extends AppCompatActivity {
                                     if (jsonArray.length() > 0) {
                                         Log.i(Global.TAG, "contents exist.");
 
-                                        String id = jsonArray.getJSONObject(0).getString("id");
+                                        // String id = jsonArray.getJSONObject(0).getString("id");
                                         String name = jsonArray.getJSONObject(0).getString("name");
-                                        String phone = jsonArray.getJSONObject(0).getString("phone");
+                                        // String phone = jsonArray.getJSONObject(0).getString("phone");
                                         String text = jsonArray.getJSONObject(0).getString("text");
                                         String source = jsonArray.getJSONObject(0).getString("source");
-                                        String imei = jsonArray.getJSONObject(0).getString("imei");
+                                        // String imei = jsonArray.getJSONObject(0).getString("imei");
 
                                         // TODO: 이미 등록된 컨텐츠 정보를 띄우고, 수정 버튼으로 변경
                                         btn_check = 1;
@@ -388,19 +387,22 @@ public class ContentsActivity extends AppCompatActivity {
             // Instead, a URI to that document will be contained in the return intent
             // provided to this method as a parameter.
             // Pull that URI using resultData.getData().
-            Uri uri = null;
             if (resultData != null) {
-                uri = resultData.getData();
-                Log.i(Global.TAG, "Uri: " + uri.getPath());
-                Log.i(Global.TAG, "Path: " + contentsFilePath.getPath(getApplicationContext(), uri));
+                Uri uri = resultData.getData();
+                if (uri != null) {
+                    Log.i(Global.TAG, "Uri: " + uri.getPath());
+                    Log.i(Global.TAG, "Path: " + ContentsFilePath.getPath(getApplicationContext(), uri));
 
-                // filePath
-                filePath = contentsFilePath.getPath(getApplicationContext(), uri);
+                    // filePath
+                    filePath = ContentsFilePath.getPath(getApplicationContext(), uri);
 
-                //filePath(/storage/emulated/0/Movies/)를 변경해서 파일명.확장자 고객화면에 보여주기
-                String[] splitFilePath = filePath.split("/");
-                userSource = splitFilePath[splitFilePath.length - 1];
-                textSource.setText(userSource);
+                    if (filePath != null) {
+                        //filePath(/storage/emulated/0/Movies/)를 변경해서 파일명.확장자 고객화면에 보여주기
+                        String[] splitFilePath = filePath.split("/");
+                        userSource = splitFilePath[splitFilePath.length - 1];
+                        textSource.setText(userSource);
+                    }
+                }
             }
         }
     }

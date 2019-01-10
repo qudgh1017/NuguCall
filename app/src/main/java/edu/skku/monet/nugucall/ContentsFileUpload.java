@@ -6,7 +6,9 @@ package edu.skku.monet.nugucall;
 */
 
 import android.util.Log;
+
 import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -21,21 +23,10 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 
-public class ContentsFileUpload {
-
-    private Socket socket; // 연결
-    private BufferedReader bufferedReader; // 문자열 수신
-    private PrintWriter printWriter; // 문자열 발신
-    private BufferedOutputStream bufferedOutputStream; // 바이트 발신
-    private BufferedInputStream bufferedInputStream; //바이트 수신
-    private String filePath;
-
-    // ThreadReceive 인터페이스 선언
-    public interface ThreadReceive {
-        public void onReceiveRun(String message);
-    }
+class ContentsFileUpload {
 
     private ThreadReceive threadReceive;
+    private String filePath;
 
     // 생성자
     ContentsFileUpload(ThreadReceive threadReceive, String filePath) {
@@ -43,7 +34,7 @@ public class ContentsFileUpload {
         this.filePath = filePath;
     }
 
-    public void fileUpload() {
+    void fileUpload() {
         FileUploadThread fileUploadThread = new FileUploadThread();
         fileUploadThread.start();
     }
@@ -53,7 +44,7 @@ public class ContentsFileUpload {
         @Override
         public void run() {
             try {
-                socket = new Socket();
+                Socket socket = new Socket();
                 SocketAddress socketAddress = new InetSocketAddress(Global.SERVER_IP, Global.SERVER_UPLOAD_PORT);
                 socket.connect(socketAddress, 3000);
 
@@ -63,23 +54,23 @@ public class ContentsFileUpload {
                 // 문자열 수신 기능
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 // 문자열 속도 개선
-                bufferedReader = new BufferedReader(inputStreamReader);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
                 // --- 모든 발신
                 OutputStream outputStream = socket.getOutputStream();
                 // 문자열 발신기능
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
                 // 문자열 속도 개선
-                printWriter = new PrintWriter(outputStreamWriter);
+                PrintWriter printWriter = new PrintWriter(outputStreamWriter);
                 // Byte(파일) 발신기능(+속도개선)
-                bufferedOutputStream = new BufferedOutputStream(outputStream);
+                BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
 
                 // 파일 선언
                 File file = new File(filePath);
                 // 파일 읽는 기능
                 FileInputStream fileInputStream = new FileInputStream(file);
                 // 파일 읽는 기능을 속도 개선
-                bufferedInputStream = new BufferedInputStream(fileInputStream);
+                BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
                 // Byte(파일) 수신기능(+속도개선)
                 // bufferedInputStream = new BufferedInputStream(inputStream);
 
@@ -127,7 +118,9 @@ public class ContentsFileUpload {
         }
     }
 
-    /* ContentsFileDownload class 하나 더 만들기
+    /*
+
+    // ContentsFileDownload class 하나 더 만들기
     public void fileDownload() {
         FileDownloadThread fileDownloadThread = new FileDownloadThread();
         fileDownloadThread.start();
@@ -139,6 +132,7 @@ public class ContentsFileUpload {
         public void run() {
 
         }
-    }*/
+    }
 
+    */
 }
