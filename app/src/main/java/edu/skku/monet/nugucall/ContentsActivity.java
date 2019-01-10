@@ -4,6 +4,7 @@ package edu.skku.monet.nugucall;
     by 유병호
     컨텐츠 등록, 수정, 삭제, 초기화, 파일첨부, 문서검색 기능
 */
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -40,6 +41,21 @@ public class ContentsActivity extends AppCompatActivity {
 
     //btn_send가 등록인지 수정인지 알기위해 (등록:0, 수정:1)
     int btn_check = 0;
+
+    // ContentsFileUpload 클래스에 있는 ThreadReceive 인터페이스 생성
+    ContentsFileUpload.ThreadReceive threadReceive = new ContentsFileUpload.ThreadReceive() {
+
+        @Override
+        public void onReceiveRun(String message) {
+            userSource = message;
+            // contents 업로드 성공하면 등록 또는 수정
+            if (btn_check == 0) { // 등록 버튼일 경우
+                insertContents();
+            } else if (btn_check == 1) {// 수정 버튼일 경우
+                updateContents();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,18 +96,12 @@ public class ContentsActivity extends AppCompatActivity {
                     userSource = textSource.getText().toString();
 
                     // contents 업로드할 때 쓰는 contentsFileUpload 클래스 생성
-                    ContentsFileUpload contentsFileUpload = new ContentsFileUpload(filePath);
+                    ContentsFileUpload contentsFileUpload = new ContentsFileUpload(threadReceive, filePath);
 
-                    // ContentsDB 등록하기 전 먼저 파일을 서버에 보내기
-                    //contentsFileUpload.fileUpload();
+                    // ContentsDB 등록하기 전 먼저 파일을 서버에 보내기, fileUpload 함수에서 실행하는 fileUploadThread에서 서버와 데이터를 주고받은 후
+                    // threadReceive.onReceiveRun(message) 실행
+                    contentsFileUpload.fileUpload();
 
-                    // contents 업로드 성공하면 등록 또는 수정
-
-                    if (btn_check == 0) { // 등록 버튼일 경우
-                        insertContents();
-                    } else if (btn_check == 1) {// 수정 버튼일 경우
-                        updateContents();
-                    }
                 }
             }
         });
@@ -119,7 +129,6 @@ public class ContentsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 performFileSearch();
-
             }
         });
     }
@@ -189,8 +198,7 @@ public class ContentsActivity extends AppCompatActivity {
                                         btn_check = 0;
                                         btn_send.setText("등록");
                                         btn_delete.setVisibility(View.GONE); //
-                                        //textName.setText("");
-                                        //textText.setText("");
+
                                     }
                                     break;
 
@@ -394,7 +402,6 @@ public class ContentsActivity extends AppCompatActivity {
             }
         }
     }
-
 }
 
 
