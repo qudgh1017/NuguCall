@@ -2,7 +2,7 @@ package edu.skku.monet.nugucall;
 /*
     2019.01.09
     by 유병호
-    소켓 통신으로 이미지 또는 동영상 서버에 올리기
+    소켓 통신으로 이미지 또는 동영상 서버에서 받기
 */
 
 import android.util.Log;

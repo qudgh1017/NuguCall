@@ -25,8 +25,6 @@ import org.json.JSONObject;
 
 public class ContentsActivity extends AppCompatActivity {
 
-    // 문서 제공자 검색하기 위한 CODE
-    public static final int READ_REQUEST_CODE = 42;
     String userName = "", userText = "", userSource = "";
     // 폰 정보 불러온 값을 저장할 변수
     String userIMEI = "", userPhoneNumber = "";
@@ -369,7 +367,7 @@ public class ContentsActivity extends AppCompatActivity {
         intent.setType("image/*");
         intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*"});
 
-        startActivityForResult(intent, READ_REQUEST_CODE);
+        startActivityForResult(intent, Global.REQ_CODE_FILE_SELECT);
     }
 
     // 문서 제공자 검색을 위한 함수2 (결과처리)
@@ -382,7 +380,7 @@ public class ContentsActivity extends AppCompatActivity {
         // READ_REQUEST_CODE. If the request code seen here doesn't match, it's the
         // response to some other intent, and the code below shouldn't run at all.
 
-        if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+        if (requestCode == Global.REQ_CODE_FILE_SELECT && resultCode == Activity.RESULT_OK) {
             // The document selected by the user won't be returned in the intent.
             // Instead, a URI to that document will be contained in the return intent
             // provided to this method as a parameter.

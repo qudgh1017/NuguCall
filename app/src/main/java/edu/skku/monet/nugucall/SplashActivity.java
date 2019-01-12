@@ -19,10 +19,6 @@ import java.io.File;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static final int REQ_CODE_PERM_PHONE = 1001;
-    private static final int REQ_CODE_PERM_STORAGE = 1002;
-    private static final int REQ_CODE_PERM_OVERLAY = 1003;
-
     private Handler handler;
 
     @Override
@@ -43,7 +39,7 @@ public class SplashActivity extends AppCompatActivity {
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             checkStoragePermission();
         } else {
-            ActivityCompat.requestPermissions(SplashActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQ_CODE_PERM_PHONE);
+            ActivityCompat.requestPermissions(SplashActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, Global.REQ_CODE_PERMISSION_PHONE);
         }
     }
 
@@ -52,7 +48,7 @@ public class SplashActivity extends AppCompatActivity {
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             checkOverlayPermission();
         } else {
-            ActivityCompat.requestPermissions(SplashActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQ_CODE_PERM_STORAGE);
+            ActivityCompat.requestPermissions(SplashActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, Global.REQ_CODE_PERMISSION_STORAGE);
         }
     }
 
@@ -63,7 +59,7 @@ public class SplashActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(getApplicationContext(), "다른 앱 위에 그리기 권한이 필요합니다.", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
-                startActivityForResult(intent, REQ_CODE_PERM_OVERLAY);
+                startActivityForResult(intent, Global.REQ_CODE_PERMISSION_OVERLAY);
             }
         }
     }
@@ -99,19 +95,19 @@ public class SplashActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQ_CODE_PERM_PHONE) {
+        if (requestCode == Global.REQ_CODE_PERMISSION_PHONE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 checkStoragePermission();
             } else {
                 finish();
             }
-        } else if (requestCode == REQ_CODE_PERM_STORAGE) {
+        } else if (requestCode == Global.REQ_CODE_PERMISSION_STORAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 checkOverlayPermission();
             } else {
                 finish();
             }
-        } else if (requestCode == REQ_CODE_PERM_OVERLAY) {
+        } else if (requestCode == Global.REQ_CODE_PERMISSION_OVERLAY) {
             if (Build.VERSION.SDK_INT >= 23) {
                 if (Settings.canDrawOverlays(getApplicationContext())) {
                     goToContentsActivity();
