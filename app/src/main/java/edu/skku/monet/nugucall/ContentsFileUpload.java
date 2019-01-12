@@ -89,6 +89,8 @@ class ContentsFileUpload {
                 // 2. BufferedReader를 통해 서버에서 올 문자열 답변에 대기(readLine()) => 답변으로 "(년월일시분초).확장자" => ContentsDB의 source에 입력될 문자열
                 String message = bufferedReader.readLine();
                 Log.i(Global.TAG, "message: " + message);
+                JSONObject object = new JSONObject(message);
+                message = object.getString("fileName");
 
                 // 3. BufferedInputStream을 통해 파일을 읽음과 동시에 BufferedOutputStream을 통해 파일을 서버로 전송
                 // 보내준 거(bufferedOutputStream) flush 해주기
@@ -98,7 +100,6 @@ class ContentsFileUpload {
                     int length = bufferedInputStream.read(buffer);
                     bufferedOutputStream.write(buffer, 0, length);
                     check += length;
-                    Log.i(Global.TAG, "length: " + length);
                 }
                 bufferedOutputStream.flush();
 
