@@ -7,6 +7,10 @@ class Global {
     static final int SERVER_DOWNLOAD_PORT = 8082;
     static final String TAG = "edu.skku.monet.nugucall";
 
+    static final String SHARED_PREFERENCES = "nugucall";
+    static final String SHARED_PREFERENCES_WIDTH = "width";
+    static final String SHARED_PREFERENCES_HEIGHT = "height";
+
     static final int NOTIFICATION_ID = 1;
     static final String NOTIFICATION_CHANNEL_ID = "NUGUCALL";
     static final String NOTIFICATION_CHANNEL_NAME = "NUGUCALL";
