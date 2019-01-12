@@ -23,29 +23,29 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 
-class ContentsFileUpload {
+class ContentsFileDownload {
 
     private ThreadReceive threadReceive;
     private String filePath;
 
     // 생성자
-    ContentsFileUpload(ThreadReceive threadReceive, String filePath) {
+    ContentsFileDownload(ThreadReceive threadReceive, String filePath) {
         this.threadReceive = threadReceive;
         this.filePath = filePath;
     }
 
-    void fileUpload() {
-        FileUploadThread fileUploadThread = new FileUploadThread();
-        fileUploadThread.start();
+    void fileDownload() {
+        FileDownloadThread fileDownloadThread = new FileDownloadThread();
+        fileDownloadThread.start();
     }
 
     // 파일 업로드 스레드
-    private class FileUploadThread extends Thread {
+    private class FileDownloadThread extends Thread {
         @Override
         public void run() {
             try {
                 Socket socket = new Socket();
-                SocketAddress socketAddress = new InetSocketAddress(Global.SERVER_IP, Global.SERVER_UPLOAD_PORT);
+                SocketAddress socketAddress = new InetSocketAddress(Global.SERVER_IP, Global.SERVER_DOWNLOAD_PORT);
                 socket.connect(socketAddress, 3000);
 
                 // 서버로부터 문자열(파일 이름) 받기 위해서 수신 기능 씀
@@ -56,7 +56,7 @@ class ContentsFileUpload {
                 // 문자열 속도 개선
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
-                // 서버에 문자열(파일 이름, 파일 크기) 보내기 위해서 발신 기능 씀
+                // 서버에 문자열(파일 이름) 보내기 위해서 발신 기능 씀
                 // --- 모든 발신
                 OutputStream outputStream = socket.getOutputStream();
                 // 문자열 발신 기능
@@ -90,7 +90,7 @@ class ContentsFileUpload {
                 String message = bufferedReader.readLine();
                 Log.i(Global.TAG, "message: " + message);
 
-                // 3. BufferedInputStream을 통해 파일을 읽음과 동시에 BufferedOutputStream을 통해 파일을 서버로 전송
+                // 3. BufferedInputStream을 통해 파일을 읽음과 동시에 BufferedOutPutStream을 통해 파일을 서버로 전송
                 // 보내준 거(bufferedOutputStream) flush 해주기
                 byte[] buffer = new byte[65536];
                 long check = 0;
