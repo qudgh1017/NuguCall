@@ -148,7 +148,7 @@ public class BackgroundService extends Service {
             if (action != null && action.equals(Intent.ACTION_NEW_OUTGOING_CALL)) {
                 isIncomingCall = false;
                 phoneNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
-                phoneNumber = PhoneNumberUtils.formatNumber(phoneNumber);
+
                 Log.i(Global.TAG, "phoneNumber : " + phoneNumber);
                 insertRecords(phoneNumber);
             }
@@ -158,7 +158,7 @@ public class BackgroundService extends Service {
                 case TelephonyManager.CALL_STATE_RINGING: // 전화 수신
                     isIncomingCall = true;
                     phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
-                    phoneNumber = PhoneNumberUtils.formatNumber(phoneNumber);
+
                     Log.i(Global.TAG, "phoneNumber : " + phoneNumber);
                     selectRecords(phoneNumber);
                     break;
@@ -167,7 +167,7 @@ public class BackgroundService extends Service {
 
                     } else { // 전화 발신
                         phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
-                        phoneNumber = PhoneNumberUtils.formatNumber(phoneNumber);
+
                         Log.i(Global.TAG, "phoneNumber : " + phoneNumber);
                         insertRecords(phoneNumber);
                     }
@@ -240,8 +240,8 @@ public class BackgroundService extends Service {
             contentsActivity.getPhoneState();
 
             JSONObject parameter = new JSONObject();
-            parameter.put("sender", contentsActivity.getUserPhoneNumber());
-            parameter.put("receiver", phoneNumber);
+            parameter.put("sender", phoneNumber);
+            parameter.put("receiver", contentsActivity.getUserPhoneNumber());
 
             CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
                 @Override
@@ -262,7 +262,8 @@ public class BackgroundService extends Service {
 
                                 case "1": // 오류 없음 (컨텐츠 다운받아서 보여주기)
                                     Toast.makeText(getApplicationContext(), "오류 없음", Toast.LENGTH_SHORT).show();
-                                    // 핸드폰에 컨텐츠 보여주기
+                                    // 핸드폰에 컨텐츠 보여주기.
+
                                     break;
 
                             }
@@ -278,6 +279,10 @@ public class BackgroundService extends Service {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void selectYourContents(String phoneNumber){
+
     }
 
     @Override
