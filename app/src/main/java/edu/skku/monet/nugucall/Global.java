@@ -1,5 +1,9 @@
 package edu.skku.monet.nugucall;
 
+import android.os.Environment;
+
+import java.io.File;
+
 class Global {
     static final String SERVER_ADDRESS = "http://115.145.170.56:8085/";
     static final String SERVER_IP = "115.145.170.56";
@@ -20,4 +24,6 @@ class Global {
     static final int REQ_CODE_PERMISSION_OVERLAY = 1003;
     static final int REQ_CODE_FILE_SELECT = 2001;
     static final int REQ_CODE_NOTIFICATION_INTENT = 3001;
+
+    static final String DEFAULT_PATH = Environment.getExternalStorageDirectory().getPath() + File.separator + "NuguCall";
 }

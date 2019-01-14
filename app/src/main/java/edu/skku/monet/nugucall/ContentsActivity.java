@@ -34,19 +34,19 @@ public class ContentsActivity extends AppCompatActivity {
     TextView textPhoneNumber, textIMEI, textSource;
     Button btn_send, btn_reset, btn_delete, btn_fileUpload;
 
-    public String getUserPhoneNumber(){
+    public String getUserPhoneNumber() {
         return userPhoneNumber;
     }
 
-    public void setUserPhoneNumber(String userPhoneNumber){
+    public void setUserPhoneNumber(String userPhoneNumber) {
         this.userPhoneNumber = userPhoneNumber;
     }
 
-    public String getUserIMEI(){
+    public String getUserIMEI() {
         return userIMEI;
     }
 
-    public void setUserIMEI(String userIMEI){
+    public void setUserIMEI(String userIMEI) {
         this.userIMEI = userIMEI;
     }
 

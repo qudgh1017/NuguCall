@@ -8,7 +8,6 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -87,7 +86,7 @@ public class SplashActivity extends AppCompatActivity {
         sharedPreferences.edit().putInt(Global.SHARED_PREFERENCES_HEIGHT, full_height / 2).apply();
 
         // 누구콜 전용 컨텐츠 폴더를 생성하기
-        File file = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + getString(R.string.app_name));
+        File file = new File(Global.DEFAULT_PATH);
         if (file.exists()) {
             handler.postDelayed(new Runnable() {
                 @Override
