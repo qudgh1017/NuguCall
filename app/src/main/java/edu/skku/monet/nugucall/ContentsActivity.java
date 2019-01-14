@@ -34,6 +34,22 @@ public class ContentsActivity extends AppCompatActivity {
     TextView textPhoneNumber, textIMEI, textSource;
     Button btn_send, btn_reset, btn_delete, btn_fileUpload;
 
+    public String getUserPhoneNumber(){
+        return userPhoneNumber;
+    }
+
+    public void setUserPhoneNumber(String userPhoneNumber){
+        this.userPhoneNumber = userPhoneNumber;
+    }
+
+    public String getUserIMEI(){
+        return userIMEI;
+    }
+
+    public void setUserIMEI(String userIMEI){
+        this.userIMEI = userIMEI;
+    }
+
     //btn_send가 등록인지 수정인지 알기위해 (등록:0, 수정:1)
     int btn_check = 0;
 
@@ -72,8 +88,8 @@ public class ContentsActivity extends AppCompatActivity {
         getPhoneState();
 
         // 고객 화면에 보여주기위한 값
-        textPhoneNumber.setText(userPhoneNumber);
-        textIMEI.setText(userIMEI);
+        textPhoneNumber.setText(getUserPhoneNumber());
+        textIMEI.setText(getUserIMEI());
 
         // 처음 컨텐츠 등록된 상태인지 조회하기 위해
         hasContents();
@@ -138,14 +154,15 @@ public class ContentsActivity extends AppCompatActivity {
 
         try {
             if (android.os.Build.VERSION.SDK_INT >= 26) {
-                userIMEI = tm.getImei();
+                setUserIMEI(tm.getImei());
             } else {
-                userIMEI = tm.getDeviceId();
+                setUserIMEI(tm.getDeviceId());
             }
-            //userPhoneNumber = tm.getLine1Number();
-            userPhoneNumber = "+821067373845"; //임의로 설정(USIM 없어서)
+            //setUserPhoneNumber(tm.getLine1Number());
+            setUserPhoneNumber("+821067373845"); //임의로 설정(USIM 없어서)
             //+82를 0으로 바꿔주기
-            userPhoneNumber = userPhoneNumber.replace("+82", "0");
+            userPhoneNumber = getUserPhoneNumber().replace("+82", "0");
+            setUserPhoneNumber(userPhoneNumber);
 
             Log.i("userIMEI", userIMEI + "");
             Log.i("userPhoneNumber", userPhoneNumber + "");
@@ -161,7 +178,7 @@ public class ContentsActivity extends AppCompatActivity {
             String address = "select_my_contents"; // 통신할 JSP 주소
             //select_my_contents에서 IMEI로 정보 조회
             JSONObject parameter = new JSONObject();
-            parameter.put("imei", userIMEI + ""); // 매개변수, 값
+            parameter.put("imei", getUserIMEI() + ""); // 매개변수, 값
 
             CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
                 @Override
@@ -227,10 +244,10 @@ public class ContentsActivity extends AppCompatActivity {
 
             JSONObject parameter = new JSONObject();
             parameter.put("name", userName);
-            parameter.put("phone", userPhoneNumber);
+            parameter.put("phone", getUserPhoneNumber());
             parameter.put("text", userText);
             parameter.put("source", userSource);
-            parameter.put("imei", userIMEI);
+            parameter.put("imei", getUserIMEI());
 
             CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
                 @Override
@@ -276,10 +293,10 @@ public class ContentsActivity extends AppCompatActivity {
 
             JSONObject parameter = new JSONObject();
             parameter.put("name", userName);
-            parameter.put("phone", userPhoneNumber);
+            parameter.put("phone", getUserPhoneNumber());
             parameter.put("text", userText);
             parameter.put("source", userSource);
-            parameter.put("imei", userIMEI);
+            parameter.put("imei", getUserIMEI());
 
             CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
                 @Override
@@ -319,7 +336,7 @@ public class ContentsActivity extends AppCompatActivity {
             String address = "delete_my_contents"; // 통신할 JSP 주소
 
             JSONObject parameter = new JSONObject();
-            parameter.put("imei", userIMEI);
+            parameter.put("imei", getUserIMEI());
 
             CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
                 @Override

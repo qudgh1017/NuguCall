@@ -22,8 +22,16 @@ import android.view.LayoutInflater;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.sql.Time;
+import java.util.concurrent.ExecutionException;
 
 public class BackgroundService extends Service {
 
@@ -35,6 +43,9 @@ public class BackgroundService extends Service {
 
     private WindowManager windowManager;
     private CallScreenLayout callScreenLayout;
+
+    // getPhonestate() 함수 쓰려고
+    ContentsActivity contentsActivity = new ContentsActivity();
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -174,10 +185,99 @@ public class BackgroundService extends Service {
 
     public void insertRecords(String phoneNumber) {
         // TODO: 발신했을 경우 발신 기록을 DB에 삽입
+        Log.i(Global.TAG, "insertRecords() invoked.");
+
+        try {
+            String address = "insert_my_records"; // 통신할 JSP 주소
+
+            contentsActivity.getPhoneState();
+            long time = System.currentTimeMillis();
+
+            JSONObject parameter = new JSONObject();
+            parameter.put("sender", contentsActivity.getUserPhoneNumber());
+            parameter.put("receiver", phoneNumber);
+            parameter.put("imei", contentsActivity.getUserIMEI());
+            parameter.put("time", time);
+
+            CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
+                @Override
+                public void callback(String out) {
+                    try{
+                        if(out!=null){ // 안드로이드 - JSP 통신 성공
+                            JSONObject json = new JSONObject(out);
+                            String result = json.getString("result");
+
+                            switch(result){
+                                case "1": // JSP - DB 통신 성공
+                                    Log.i(Global.TAG, "insert_my_records() : 발신기록을 DB에 삽입하였습니다.");
+                                    break;
+                                case "0": // JSP - DB 통신 오류 발생
+                                    Toast.makeText(getApplicationContext(), "DB Error Occurred.", Toast.LENGTH_SHORT).show();
+                                    break;
+                            }
+                        }else { // 안드로이드 - JSP 통신 오류 발생
+                            Toast.makeText(getApplicationContext(), "JSP Error Occured.", Toast.LENGTH_SHORT).show();
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            });
+            communicateDB.execute();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     public void selectRecords(String phoneNumber) {
         // TODO: 수신했을 경우 발신 기록을 DB에서 조회
+        Log.i(Global.TAG, "selectRecords() invoked.");
+
+        try {
+            String address = "select_your_records"; // 통신할 JSP 주소
+
+            contentsActivity.getPhoneState();
+
+            JSONObject parameter = new JSONObject();
+            parameter.put("sender", contentsActivity.getUserPhoneNumber());
+            parameter.put("receiver", phoneNumber);
+
+            CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
+                @Override
+                public void callback(String out) {
+                    try{
+                        if(out!=null){ // 안드로이드 - JSP 통신 성공
+                            JSONObject json = new JSONObject(out);
+                            String result = json.getString("result");
+
+                            switch(result){
+                                case "-1": // 조작된 번호
+                                    Toast.makeText(getApplicationContext(), "조작된 번호입니다.", Toast.LENGTH_SHORT).show();
+                                    // 디자인해서 핸드폰에 띄어주기
+                                    break;
+                                case "0": // 오류 발생
+                                    Toast.makeText(getApplicationContext(), "DB Error Occurred.", Toast.LENGTH_SHORT).show();
+                                    break;
+
+                                case "1": // 오류 없음 (컨텐츠 다운받아서 보여주기)
+                                    Toast.makeText(getApplicationContext(), "오류 없음", Toast.LENGTH_SHORT).show();
+                                    // 핸드폰에 컨텐츠 보여주기
+                                    break;
+
+                            }
+                        }else { // 안드로이드 - JSP 통신 오류
+                            Toast.makeText(getApplicationContext(), "JSP Error Occured.", Toast.LENGTH_SHORT).show();
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            });
+            communicateDB.execute();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
