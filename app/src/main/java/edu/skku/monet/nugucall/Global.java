@@ -14,6 +14,7 @@ class Global {
     static final String SHARED_PREFERENCES = "nugucall";
     static final String SHARED_PREFERENCES_WIDTH = "width";
     static final String SHARED_PREFERENCES_HEIGHT = "height";
+    static final String SHARED_PREFERENCES_INCOMING = "incoming";
 
     static final int NOTIFICATION_ID = 1;
     static final String NOTIFICATION_CHANNEL_ID = "NUGUCALL";
@@ -26,4 +27,10 @@ class Global {
     static final int REQ_CODE_NOTIFICATION_INTENT = 3001;
 
     static final String DEFAULT_PATH = Environment.getExternalStorageDirectory().getPath() + File.separator + "NuguCall";
+
+    static final String INTENT_ACTION_INSERT_RECORDS = "INTENT_ACTION_INSERT_RECORDS";
+    static final String INTENT_ACTION_SELECT_RECORDS = "INTENT_ACTION_SELECT_RECORDS";
+    static final String INTENT_ACTION_TURN_OFF_CONTENTS = "INTENT_ACTION_TURN_OFF_CONTENTS";
+
+    static final String INTENT_EXTRA_PHONE_NUMBER = "INTENT_EXTRA_PHONE_NUMBER";
 }

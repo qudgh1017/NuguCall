@@ -1,12 +1,15 @@
 package edu.skku.monet.nugucall;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
@@ -14,6 +17,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneNumberUtils;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -42,8 +46,8 @@ public class BackgroundService extends Service {
     private CallScreenLayout callScreenLayout;
     private WindowManager.LayoutParams callScreenLayoutParams;
 
-    // getPhonestate() 함수 쓰려고
-    ContentsActivity contentsActivity = new ContentsActivity();
+    private String userIMEI;
+    private String userPhoneNumber;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -52,6 +56,8 @@ public class BackgroundService extends Service {
 
         setNotification();
         setWindowLayout();
+        setBroadcastReceiver();
+        getUserPhoneInformation();
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -222,14 +228,11 @@ public class BackgroundService extends Service {
         try {
             String address = "insert_my_records"; // 통신할 JSP 주소
 
-            contentsActivity.getPhoneState();
-            long time = System.currentTimeMillis();
-
             JSONObject parameter = new JSONObject();
-            parameter.put("sender", contentsActivity.getUserPhoneNumber());
+            parameter.put("sender", userPhoneNumber);
             parameter.put("receiver", phoneNumber);
-            parameter.put("imei", contentsActivity.getUserIMEI());
-            parameter.put("time", time);
+            parameter.put("imei", userIMEI);
+            parameter.put("time", System.currentTimeMillis());
 
             CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
                 @Override
@@ -273,11 +276,9 @@ public class BackgroundService extends Service {
         try {
             String address = "select_your_records"; // 통신할 JSP 주소
 
-            contentsActivity.getPhoneState();
-
             JSONObject parameter = new JSONObject();
             parameter.put("sender", phoneNumber);
-            parameter.put("receiver", contentsActivity.getUserPhoneNumber());
+            parameter.put("receiver", userPhoneNumber);
 
             CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
                 @Override
@@ -369,6 +370,54 @@ public class BackgroundService extends Service {
             });
             communicateDB.execute();
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setBroadcastReceiver() {
+        Log.i(Global.TAG, "setBroadcastReceiver() 실행!");
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Global.INTENT_ACTION_INSERT_RECORDS);
+        intentFilter.addAction(Global.INTENT_ACTION_SELECT_RECORDS);
+        intentFilter.addAction(Global.INTENT_ACTION_TURN_OFF_CONTENTS);
+        registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+    public BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action != null) {
+                switch (action) {
+                    case Global.INTENT_ACTION_INSERT_RECORDS:
+                        insertRecords(intent.getStringExtra(Global.INTENT_EXTRA_PHONE_NUMBER));
+                        break;
+                    case Global.INTENT_ACTION_SELECT_RECORDS:
+                        selectRecords(intent.getStringExtra(Global.INTENT_EXTRA_PHONE_NUMBER));
+                        break;
+                    case Global.INTENT_ACTION_TURN_OFF_CONTENTS:
+                        callScreenLayout.turnOffContents();
+                        break;
+                }
+            }
+        }
+    };
+
+    @SuppressLint("HardwareIds")
+    public void getUserPhoneInformation() {
+        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= 26) {
+                userIMEI = tm.getImei();
+            } else {
+                userIMEI = tm.getDeviceId();
+            }
+
+            // 번호를 받아와 +82를 0으로 바꿔주기
+            userPhoneNumber = (tm.getLine1Number()).replace("+82", "0");
+
+        } catch (SecurityException e) { // 권한 오류로 인한 경우 catch
             e.printStackTrace();
         }
     }

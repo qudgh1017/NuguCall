@@ -34,22 +34,6 @@ public class ContentsActivity extends AppCompatActivity {
     TextView textPhoneNumber, textIMEI, textSource;
     Button btn_send, btn_reset, btn_delete, btn_fileUpload;
 
-    public String getUserPhoneNumber() {
-        return userPhoneNumber;
-    }
-
-    public void setUserPhoneNumber(String userPhoneNumber) {
-        this.userPhoneNumber = userPhoneNumber;
-    }
-
-    public String getUserIMEI() {
-        return userIMEI;
-    }
-
-    public void setUserIMEI(String userIMEI) {
-        this.userIMEI = userIMEI;
-    }
-
     // btn_send가 등록인지 수정인지 알기위해 (등록:0, 수정:1)
     int btn_check = 0;
 
@@ -84,21 +68,13 @@ public class ContentsActivity extends AppCompatActivity {
         btn_delete = findViewById(R.id.btn_delete);
         btn_fileUpload = findViewById(R.id.btn_fileUpload);
 
-        // 폰정보 불러오기(userIMEI, userPhoneNumber)
-        getPhoneState();
-
-        // 고객 화면에 보여주기위한 값
-        textPhoneNumber.setText(getUserPhoneNumber());
-        textIMEI.setText(getUserIMEI());
-
-        // 처음 컨텐츠 등록된 상태인지 조회하기 위해
-        hasContents();
+        // 폰 정보 불러오기 (userIMEI, userPhoneNumber)
+        getUserPhoneInformation();
 
         // 등록, 수정 버튼 누른경우 insert
         btn_send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if (textName.getText().toString().equals("") || textText.getText().toString().equals("") || textSource.getText().toString().equals("")) {
                     Toast.makeText(ContentsActivity.this, "모든 정보를 입력해주세요", Toast.LENGTH_SHORT).show();
                 } else {
@@ -149,23 +125,28 @@ public class ContentsActivity extends AppCompatActivity {
     }
 
     @SuppressLint("HardwareIds")
-    public void getPhoneState() {
+    public void getUserPhoneInformation() {
         TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 
         try {
             if (android.os.Build.VERSION.SDK_INT >= 26) {
-                setUserIMEI(tm.getImei());
+                userIMEI = tm.getImei();
             } else {
-                setUserIMEI(tm.getDeviceId());
+                userIMEI = tm.getDeviceId();
             }
-            setUserPhoneNumber(tm.getLine1Number());
-            // setUserPhoneNumber("+821067373845"); // 임의로 설정(USIM 없어서)
-            // +82를 0으로 바꿔주기
-            userPhoneNumber = getUserPhoneNumber().replace("+82", "0");
-            setUserPhoneNumber(userPhoneNumber);
 
-            Log.i("userIMEI", userIMEI + "");
-            Log.i("userPhoneNumber", userPhoneNumber + "");
+            // 번호를 받아와 +82를 0으로 바꿔주기
+            userPhoneNumber = (tm.getLine1Number()).replace("+82", "0");
+
+            textIMEI.setText(userIMEI);
+            textPhoneNumber.setText(userPhoneNumber);
+
+            Log.i(Global.TAG, "IMEI : " + userIMEI);
+            Log.i(Global.TAG, "Phone : " + userPhoneNumber);
+
+            // 처음 컨텐츠 등록된 상태인지 조회하기 위해
+            hasContents();
+
         } catch (SecurityException e) { // 권한 오류로 인한 경우 catch
             e.printStackTrace();
         }
@@ -178,7 +159,7 @@ public class ContentsActivity extends AppCompatActivity {
             String address = "select_my_contents"; // 통신할 JSP 주소
             // select_my_contents에서 IMEI로 정보 조회
             JSONObject parameter = new JSONObject();
-            parameter.put("imei", getUserIMEI() + ""); // 매개변수, 값
+            parameter.put("imei", userIMEI); // 매개변수, 값
 
             CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
                 @Override
@@ -244,10 +225,10 @@ public class ContentsActivity extends AppCompatActivity {
 
             JSONObject parameter = new JSONObject();
             parameter.put("name", userName);
-            parameter.put("phone", getUserPhoneNumber());
+            parameter.put("phone", userPhoneNumber);
             parameter.put("text", userText);
             parameter.put("source", userSource);
-            parameter.put("imei", getUserIMEI());
+            parameter.put("imei", userIMEI);
 
             CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
                 @Override
@@ -293,10 +274,10 @@ public class ContentsActivity extends AppCompatActivity {
 
             JSONObject parameter = new JSONObject();
             parameter.put("name", userName);
-            parameter.put("phone", getUserPhoneNumber());
+            parameter.put("phone", userPhoneNumber);
             parameter.put("text", userText);
             parameter.put("source", userSource);
-            parameter.put("imei", getUserIMEI());
+            parameter.put("imei", userIMEI);
 
             CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
                 @Override
@@ -336,7 +317,7 @@ public class ContentsActivity extends AppCompatActivity {
             String address = "delete_my_contents"; // 통신할 JSP 주소
 
             JSONObject parameter = new JSONObject();
-            parameter.put("imei", getUserIMEI());
+            parameter.put("imei", userIMEI);
 
             CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
                 @Override
