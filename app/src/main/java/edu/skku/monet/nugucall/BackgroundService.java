@@ -296,7 +296,7 @@ public class BackgroundService extends Service {
                             switch (result) {
 
                                 case "-1": // 조작된 번호
-                                    callScreenLayout.turnOnContents(phoneNumber); // 핸드폰에 경고 화면 보여주기
+                                    callScreenLayout.turnOnContents(phoneNumber); // 스마트폰에 경고 화면 보여주기
                                     break;
 
                                 case "0": // 오류 발생
@@ -304,7 +304,7 @@ public class BackgroundService extends Service {
                                     break;
 
                                 case "1": // 오류 없음
-                                    selectYourContents(phoneNumber); // 핸드폰에 컨텐츠 화면 보여주기
+                                    selectYourContents(phoneNumber); // DB에서 상대 컨텐츠 조회
                                     break;
 
                             }
