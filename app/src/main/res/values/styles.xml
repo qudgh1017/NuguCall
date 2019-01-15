@@ -1,15 +1,15 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/ultra_violet</item>
+        <item name="colorPrimaryDark">@color/ultra_violet_dark</item>
+        <item name="colorAccent">@color/living_coral</item>
     </style>
 
     <style name="AppTheme.Splash" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimary</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/ultra_violet</item>
+        <item name="colorPrimaryDark">@color/ultra_violet_dark</item>
+        <item name="colorAccent">@color/living_coral</item>
         <item name="android:windowBackground">@drawable/splash</item>
         <item name="android:windowNoTitle">true</item>
     </style>

@@ -1,6 +1,8 @@
 package edu.skku.monet.nugucall;
 
 import android.Manifest;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -97,7 +99,7 @@ public class SplashActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 }
-            }, 1000);
+            }, 1500);
         } else {
             if (file.mkdir()) {
                 handler.postDelayed(new Runnable() {
@@ -108,14 +110,17 @@ public class SplashActivity extends AppCompatActivity {
                         startActivity(intent);
                         finish();
                     }
-                }, 1000);
+                }, 1500);
             } else {
                 finish();
             }
         }
 
-        Intent intent = new Intent(getApplicationContext(), BackgroundService.class);
-        startService(intent);
+        // 누구콜 백그라운드 서비스 실행하기
+        if (!isServiceRunning()) {
+            Intent intent = new Intent(getApplicationContext(), BackgroundService.class);
+            startService(intent);
+        }
     }
 
     @Override
@@ -148,5 +153,20 @@ public class SplashActivity extends AppCompatActivity {
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public boolean isServiceRunning() {
+        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo runningServiceInfo : activityManager.getRunningServices(Integer.MAX_VALUE)) {
+            if (runningServiceInfo.service.getClassName().equals("edu.skku.monet.nugucall.BackgroundService")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void onBackPressed() {
+
     }
 }

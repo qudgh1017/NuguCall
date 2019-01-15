@@ -419,7 +419,7 @@ public class BackgroundService extends Service {
         }
     };
 
-    @SuppressLint("HardwareIds")
+    @SuppressLint({"HardwareIds", "MissingPermission"})
     public void getUserPhoneInformation() {
         TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 
@@ -433,7 +433,7 @@ public class BackgroundService extends Service {
             // 번호를 받아와 +82를 0으로 바꿔주기
             userPhoneNumber = (tm.getLine1Number()).replace("+82", "0");
 
-        } catch (SecurityException e) { // 권한 오류로 인한 경우 catch
+        } catch (Exception e) { // 권한 오류로 인한 경우 catch
             e.printStackTrace();
         }
     }

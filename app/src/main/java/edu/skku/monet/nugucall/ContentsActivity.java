@@ -124,7 +124,7 @@ public class ContentsActivity extends AppCompatActivity {
         });
     }
 
-    @SuppressLint("HardwareIds")
+    @SuppressLint({"HardwareIds", "MissingPermission"})
     public void getUserPhoneInformation() {
         TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 
@@ -147,7 +147,7 @@ public class ContentsActivity extends AppCompatActivity {
             // 처음 컨텐츠 등록된 상태인지 조회하기 위해
             hasContents();
 
-        } catch (SecurityException e) { // 권한 오류로 인한 경우 catch
+        } catch (Exception e) { // 권한 오류로 인한 경우 catch
             e.printStackTrace();
         }
     }

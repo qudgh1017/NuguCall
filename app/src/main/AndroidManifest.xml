@@ -29,6 +29,7 @@
 
         <activity
             android:name=".ContentsActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
 
