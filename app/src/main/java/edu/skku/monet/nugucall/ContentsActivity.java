@@ -50,7 +50,7 @@ public class ContentsActivity extends AppCompatActivity {
         this.userIMEI = userIMEI;
     }
 
-    //btn_send가 등록인지 수정인지 알기위해 (등록:0, 수정:1)
+    // btn_send가 등록인지 수정인지 알기위해 (등록:0, 수정:1)
     int btn_check = 0;
 
     // TODO: 1. ContentsFileUpload 클래스에 있는 ThreadReceive 인터페이스 생성 및 정의
@@ -63,7 +63,7 @@ public class ContentsActivity extends AppCompatActivity {
             // contents 업로드 성공하면 등록 또는 수정
             if (btn_check == 0) { // 등록 버튼일 경우
                 insertContents();
-            } else if (btn_check == 1) {// 수정 버튼일 경우
+            } else if (btn_check == 1) { // 수정 버튼일 경우
                 updateContents();
             }
         }
@@ -159,14 +159,14 @@ public class ContentsActivity extends AppCompatActivity {
                 setUserIMEI(tm.getDeviceId());
             }
             setUserPhoneNumber(tm.getLine1Number());
-            //setUserPhoneNumber("+821067373845"); //임의로 설정(USIM 없어서)
-            //+82를 0으로 바꿔주기
+            // setUserPhoneNumber("+821067373845"); // 임의로 설정(USIM 없어서)
+            // +82를 0으로 바꿔주기
             userPhoneNumber = getUserPhoneNumber().replace("+82", "0");
             setUserPhoneNumber(userPhoneNumber);
 
             Log.i("userIMEI", userIMEI + "");
             Log.i("userPhoneNumber", userPhoneNumber + "");
-        } catch (SecurityException e) { //권한 오류로 인한 경우 catch
+        } catch (SecurityException e) { // 권한 오류로 인한 경우 catch
             e.printStackTrace();
         }
     }
@@ -176,7 +176,7 @@ public class ContentsActivity extends AppCompatActivity {
 
         try {
             String address = "select_my_contents"; // 통신할 JSP 주소
-            //select_my_contents에서 IMEI로 정보 조회
+            // select_my_contents에서 IMEI로 정보 조회
             JSONObject parameter = new JSONObject();
             parameter.put("imei", getUserIMEI() + ""); // 매개변수, 값
 
@@ -258,10 +258,10 @@ public class ContentsActivity extends AppCompatActivity {
                             String result = json.getString("result");
 
                             switch (result) {
-                                case "1":// JSP - DB 통신 성공
+                                case "1": // JSP - DB 통신 성공
                                     Toast.makeText(getApplicationContext(), "컨텐츠가 등록되었습니다.", Toast.LENGTH_SHORT).show();
 
-                                    //등록되면 수정으로 바꿔주고 삭제버튼 보이게
+                                    // 등록되면 수정으로 바꿔주고 삭제버튼 보이게
                                     btn_check = 1;
                                     btn_send.setText("수정");
                                     btn_delete.setVisibility(View.VISIBLE);
@@ -307,7 +307,7 @@ public class ContentsActivity extends AppCompatActivity {
                             String result = json.getString("result");
 
                             switch (result) {
-                                case "1":// JSP - DB 통신 성공
+                                case "1": // JSP - DB 통신 성공
                                     Toast.makeText(getApplicationContext(), "컨텐츠가 수정되었습니다.", Toast.LENGTH_SHORT).show();
                                     break;
 
@@ -342,21 +342,21 @@ public class ContentsActivity extends AppCompatActivity {
                 @Override
                 public void callback(String out) {
                     try {
-                        if (out != null) {// 안드로이드 - JSP 통신 성공
+                        if (out != null) { // 안드로이드 - JSP 통신 성공
                             JSONObject json = new JSONObject(out);
                             String result = json.getString("result");
 
                             switch (result) {
-                                case "1":// JSP - DB 통신 성공
+                                case "1": // JSP - DB 통신 성공
                                     Toast.makeText(getApplicationContext(), "컨텐츠가 삭제되었습니다.", Toast.LENGTH_SHORT).show();
                                     btn_check = 0;
                                     finish();
                                     break;
-                                case "0":// JSP - DB 통신 오류 발생
+                                case "0": // JSP - DB 통신 오류 발생
                                     Toast.makeText(getApplicationContext(), "DB Error Occurred.", Toast.LENGTH_SHORT).show();
                                     break;
                             }
-                        } else {// 안드로이드 - JSP 통신 오류 발생
+                        } else { // 안드로이드 - JSP 통신 오류 발생
                             Toast.makeText(getApplicationContext(), "JSP Error Occurred.", Toast.LENGTH_SHORT).show();
                         }
                     } catch (Exception e) {
@@ -412,7 +412,7 @@ public class ContentsActivity extends AppCompatActivity {
                     filePath = ContentsFilePath.getPath(getApplicationContext(), uri);
 
                     if (filePath != null) {
-                        //filePath(/storage/emulated/0/Movies/)를 변경해서 파일명.확장자 고객화면에 보여주기
+                        // filePath(/storage/emulated/0/Movies/)를 변경해서 파일명.확장자 고객화면에 보여주기
                         String[] splitFilePath = filePath.split("/");
                         userSource = splitFilePath[splitFilePath.length - 1];
                         textSource.setText(userSource);
