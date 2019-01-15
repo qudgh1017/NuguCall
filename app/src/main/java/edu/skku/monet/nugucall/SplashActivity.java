@@ -113,6 +113,9 @@ public class SplashActivity extends AppCompatActivity {
                 finish();
             }
         }
+
+        Intent intent = new Intent(getApplicationContext(), BackgroundService.class);
+        startService(intent);
     }
 
     @Override
