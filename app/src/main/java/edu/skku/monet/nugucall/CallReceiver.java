@@ -8,8 +8,6 @@ import android.util.Log;
 
 public class CallReceiver extends BroadcastReceiver {
 
-    private boolean isIncomingCall = false;
-
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i(Global.TAG, "onReceive() 실행!");
