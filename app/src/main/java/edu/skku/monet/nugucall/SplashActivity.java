@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -128,7 +129,13 @@ public class SplashActivity extends AppCompatActivity {
             } else {
                 finish();
             }
-        } else if (requestCode == Global.REQ_CODE_PERMISSION_OVERLAY) {
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == Global.REQ_CODE_PERMISSION_OVERLAY) {
             if (Build.VERSION.SDK_INT >= 23) {
                 if (Settings.canDrawOverlays(getApplicationContext())) {
                     goToContentsActivity();
@@ -137,6 +144,6 @@ public class SplashActivity extends AppCompatActivity {
                 }
             }
         }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
