@@ -67,7 +67,9 @@ public class BackgroundService extends Service {
     }
 
     public void setNotification() {
+        Log.i(Global.TAG, "setNotification() 실행!");
         if (Build.VERSION.SDK_INT >= 26) { // 안드로이드 8.0 이상에서는 알림 채널 생성이 필수
+            Log.i(Global.TAG, "setNotification() if (Build.VERSION.SDK_INT >= 26) 실행!");
             NotificationChannel notificationChannel = new NotificationChannel(Global.NOTIFICATION_CHANNEL_ID, Global.NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             if (notificationManager != null) {
@@ -88,6 +90,7 @@ public class BackgroundService extends Service {
     }
 
     public void setWindowLayout() {
+        Log.i(Global.TAG, "setWindowLayout() 실행!");
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
         callScreenLayout = new CallScreenLayout(getApplicationContext());
@@ -115,7 +118,6 @@ public class BackgroundService extends Service {
     }
 
     private class CallScreenLayout extends LinearLayout {
-
         private TextView tv_name; // 이름
         private TextView tv_phone; // 전화번호
         private ImageView iv_source; // 이미지 컨텐츠
@@ -141,6 +143,7 @@ public class BackgroundService extends Service {
 
         // 컨텐츠 보여주기
         public void turnOnContents(String name, String phone, String text, String source) {
+            Log.i(Global.TAG, "turnOnContents() 실행!");
             if (isShowing) {
                 return;
             }
@@ -160,12 +163,14 @@ public class BackgroundService extends Service {
             switch (mimeType) {
 
                 case "image":
+                    Log.i(Global.TAG, "turnOnContents() switch(image)실행!");
                     iv_source.setVisibility(View.VISIBLE);
                     RequestOptions requestOptions = new RequestOptions().centerCrop().placeholder(R.drawable.icon);
                     Glide.with(getApplicationContext()).load(file).apply(requestOptions).into(iv_source);
                     break;
 
                 case "video":
+                    Log.i(Global.TAG, "turnOnContents() switch(video)실행!");
                     vv_source.setVisibility(View.VISIBLE);
                     vv_source.setVideoPath(file.getPath());
                     vv_source.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -186,6 +191,7 @@ public class BackgroundService extends Service {
 
         // 경고창 보여주기
         public void turnOnContents(String phoneNumber) {
+            Log.i(Global.TAG, "turnOnContents(경고창) 실행!");
             if (isShowing) {
                 return;
             }
@@ -204,6 +210,7 @@ public class BackgroundService extends Service {
 
         // 창 끄기
         public void turnOffContents() {
+            Log.i(Global.TAG, "turnOffContents() 실행!");
             if (!isShowing) {
                 return;
             }
@@ -219,6 +226,7 @@ public class BackgroundService extends Service {
     }
 
     public void setBroadcastReceiver() {
+        Log.i(Global.TAG, "setBroadcastReceiver() 실행!");
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_NEW_OUTGOING_CALL);
         registerReceiver(broadcastReceiver, intentFilter);
@@ -227,11 +235,13 @@ public class BackgroundService extends Service {
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.i(Global.TAG, "onReceive() 실행!");
             String phoneNumber;
 
             // 전화 발신 (안드로이드 버전 8.0 미만) 확인
             String action = intent.getAction();
             if (action != null && action.equals(Intent.ACTION_NEW_OUTGOING_CALL)) {
+                Log.i(Global.TAG, "onReceive() if (action != null && action.equals(Intent.ACTION_NEW_OUTGOING_CALL)) 실행!");
                 isIncomingCall = false;
                 phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
                 Log.i(Global.TAG, "전화를 발신했습니다. 수신 번호 : " + phoneNumber + " (below Android Oreo)");
@@ -242,6 +252,7 @@ public class BackgroundService extends Service {
             switch (telephonyManager.getCallState()) {
 
                 case TelephonyManager.CALL_STATE_RINGING: // 전화 수신
+                    Log.i(Global.TAG, "onReceive()  case TelephonyManager.CALL_STATE_RINGING: 실행!");
                     isIncomingCall = true;
                     phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
                     Log.i(Global.TAG, "전화를 수신했습니다. 발신 번호 : " + phoneNumber);
@@ -249,6 +260,7 @@ public class BackgroundService extends Service {
                     break;
 
                 case TelephonyManager.CALL_STATE_OFFHOOK:
+                    Log.i(Global.TAG, "onReceive()  case TelephonyManager.CALL_STATE_OFFHOOK: 실행!");
                     if (isIncomingCall) { // 전화 수신 및 통화 시작
                         Log.i(Global.TAG, "전화를 수신 및 통화가 시작됐습니다.");
                     } else { // 전화 발신
@@ -259,6 +271,7 @@ public class BackgroundService extends Service {
                     break;
 
                 case TelephonyManager.CALL_STATE_IDLE:
+                    Log.i(Global.TAG, "onReceive()  case TelephonyManager.CALL_STATE_IDLE: 실행!");
                     if (isIncomingCall) { // 전화 수신 및 통화 종료
                         Log.i(Global.TAG, "전화를 수신 및 통화가 종료됐습니다.");
                         callScreenLayout.turnOffContents();
