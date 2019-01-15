@@ -1,6 +1,6 @@
 package edu.skku.monet.nugucall;
 /*
-    2019.01.09
+    2019.01.12
     by 유병호
     컨텐츠 등록, 수정, 삭제, 초기화, 파일첨부, 문서검색 기능
 */
@@ -158,8 +158,8 @@ public class ContentsActivity extends AppCompatActivity {
             } else {
                 setUserIMEI(tm.getDeviceId());
             }
-            //setUserPhoneNumber(tm.getLine1Number());
-            setUserPhoneNumber("+821067373845"); //임의로 설정(USIM 없어서)
+            setUserPhoneNumber(tm.getLine1Number());
+            //setUserPhoneNumber("+821067373845"); //임의로 설정(USIM 없어서)
             //+82를 0으로 바꿔주기
             userPhoneNumber = getUserPhoneNumber().replace("+82", "0");
             setUserPhoneNumber(userPhoneNumber);
