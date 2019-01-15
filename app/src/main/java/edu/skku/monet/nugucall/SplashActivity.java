@@ -83,8 +83,8 @@ public class SplashActivity extends AppCompatActivity {
         display.getRealSize(point);
         int full_width = point.x;
         int full_height = point.y - status_bar_height;
-        sharedPreferences.edit().putInt(Global.SHARED_PREFERENCES_WIDTH, full_width / 2).apply();
-        sharedPreferences.edit().putInt(Global.SHARED_PREFERENCES_HEIGHT, full_height / 2).apply();
+        sharedPreferences.edit().putInt(Global.SHARED_PREFERENCES_WIDTH, full_width * 7 / 10).apply(); // 가로 해상도의 7/10
+        sharedPreferences.edit().putInt(Global.SHARED_PREFERENCES_HEIGHT, full_height * 4 / 10).apply(); // 세로 해상도의 4/10
 
         // 누구콜 전용 컨텐츠 폴더를 생성하기
         File file = new File(Global.DEFAULT_PATH);

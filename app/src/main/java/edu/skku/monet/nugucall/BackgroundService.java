@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneNumberUtils;
@@ -40,6 +41,8 @@ import java.net.URLConnection;
 
 public class BackgroundService extends Service {
 
+    private Handler handler;
+
     private SharedPreferences sharedPreferences;
 
     private WindowManager windowManager;
@@ -49,8 +52,15 @@ public class BackgroundService extends Service {
     private String userIMEI;
     private String userPhoneNumber;
 
+    private String contentsName;
+    private String contentsPhone;
+    private String contentsText;
+    private String contentsSource;
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        handler = new Handler(getMainLooper());
 
         sharedPreferences = getSharedPreferences(Global.SHARED_PREFERENCES, MODE_PRIVATE);
 
@@ -63,9 +73,8 @@ public class BackgroundService extends Service {
     }
 
     public void setNotification() {
-        Log.i(Global.TAG, "setNotification() 실행!");
+        Log.i(Global.TAG, "setNotification() invoked.");
         if (Build.VERSION.SDK_INT >= 26) { // 안드로이드 8.0 이상에서는 알림 채널 생성이 필수
-            Log.i(Global.TAG, "setNotification() if (Build.VERSION.SDK_INT >= 26) 실행!");
             NotificationChannel notificationChannel = new NotificationChannel(Global.NOTIFICATION_CHANNEL_ID, Global.NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             if (notificationManager != null) {
@@ -86,7 +95,8 @@ public class BackgroundService extends Service {
     }
 
     public void setWindowLayout() {
-        Log.i(Global.TAG, "setWindowLayout() 실행!");
+        Log.i(Global.TAG, "setWindowLayout() invoked.");
+
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
         callScreenLayout = new CallScreenLayout(getApplicationContext());
@@ -139,7 +149,7 @@ public class BackgroundService extends Service {
 
         // 컨텐츠 보여주기
         public void turnOnContents(String name, String phone, String text, String source) {
-            Log.i(Global.TAG, "turnOnContents() 실행!");
+            Log.i(Global.TAG, "turnOnContents() invoked.");
             if (isShowing) {
                 return;
             }
@@ -159,14 +169,12 @@ public class BackgroundService extends Service {
             switch (mimeType) {
 
                 case "image":
-                    Log.i(Global.TAG, "turnOnContents() switch(image)실행!");
                     iv_source.setVisibility(View.VISIBLE);
                     RequestOptions requestOptions = new RequestOptions().centerCrop().placeholder(R.drawable.icon);
                     Glide.with(getApplicationContext()).load(file).apply(requestOptions).into(iv_source);
                     break;
 
                 case "video":
-                    Log.i(Global.TAG, "turnOnContents() switch(video)실행!");
                     vv_source.setVisibility(View.VISIBLE);
                     vv_source.setVideoPath(file.getPath());
                     vv_source.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -187,7 +195,7 @@ public class BackgroundService extends Service {
 
         // 경고창 보여주기
         public void turnOnContents(String phoneNumber) {
-            Log.i(Global.TAG, "turnOnContents(경고창) 실행!");
+            Log.i(Global.TAG, "turnOnContents() invoked.");
             if (isShowing) {
                 return;
             }
@@ -206,7 +214,7 @@ public class BackgroundService extends Service {
 
         // 창 끄기
         public void turnOffContents() {
-            Log.i(Global.TAG, "turnOffContents() 실행!");
+            Log.i(Global.TAG, "turnOffContents() invoked.");
             if (!isShowing) {
                 return;
             }
@@ -222,7 +230,6 @@ public class BackgroundService extends Service {
     }
 
     public void insertRecords(final String phoneNumber) {
-        // TODO: 발신했을 경우 발신 기록을 DB에 삽입
         Log.i(Global.TAG, "insertRecords() invoked.");
 
         try {
@@ -245,7 +252,6 @@ public class BackgroundService extends Service {
                             switch (result) {
 
                                 case "1": // JSP - DB 통신 성공
-                                    Log.i(Global.TAG, "insert_my_records() : 발신기록을 DB에 삽입하였습니다.");
                                     selectYourContents(phoneNumber);
                                     break;
 
@@ -270,7 +276,6 @@ public class BackgroundService extends Service {
     }
 
     public void selectRecords(final String phoneNumber) {
-        // TODO: 수신했을 경우 발신 기록을 DB에서 조회
         Log.i(Global.TAG, "selectRecords() invoked.");
 
         try {
@@ -291,19 +296,15 @@ public class BackgroundService extends Service {
                             switch (result) {
 
                                 case "-1": // 조작된 번호
-                                    Toast.makeText(getApplicationContext(), "조작된 번호입니다.", Toast.LENGTH_SHORT).show();
-                                    // 디자인해서 핸드폰에 띄어주기
-                                    callScreenLayout.turnOnContents(phoneNumber);
+                                    callScreenLayout.turnOnContents(phoneNumber); // 핸드폰에 경고 화면 보여주기
                                     break;
 
                                 case "0": // 오류 발생
                                     Toast.makeText(getApplicationContext(), "DB Error Occurred.", Toast.LENGTH_SHORT).show();
                                     break;
 
-                                case "1": // 오류 없음 (컨텐츠 다운받아서 보여주기)
-                                    Toast.makeText(getApplicationContext(), "오류 없음", Toast.LENGTH_SHORT).show();
-                                    // 핸드폰에 컨텐츠 보여주기.
-                                    selectYourContents(phoneNumber);
+                                case "1": // 오류 없음
+                                    selectYourContents(phoneNumber); // 핸드폰에 컨텐츠 화면 보여주기
                                     break;
 
                             }
@@ -322,6 +323,8 @@ public class BackgroundService extends Service {
     }
 
     public void selectYourContents(String phoneNumber) {
+        Log.i(Global.TAG, "selectYourContents() invoked.");
+
         try {
             String address = "select_your_contents";
             JSONObject parameter = new JSONObject();
@@ -340,20 +343,21 @@ public class BackgroundService extends Service {
                                     Toast.makeText(getApplicationContext(), "DB Error Occurred.", Toast.LENGTH_SHORT).show();
                                     break;
 
-                                case "1": // 오류 없음 (컨텐츠 다운받아서 보여주기)
+                                case "1": // 오류 없음
                                     JSONArray jsonArray = jsonObject.getJSONArray("items");
 
                                     if (jsonArray.length() > 0) {
-                                        Log.i(Global.TAG, "contents exist.");
 
                                         // String id = jsonArray.getJSONObject(0).getString("id");
-                                        String name = jsonArray.getJSONObject(0).getString("name");
-                                        String phone = jsonArray.getJSONObject(0).getString("phone");
-                                        String text = jsonArray.getJSONObject(0).getString("text");
-                                        String source = jsonArray.getJSONObject(0).getString("source");
+                                        contentsName = jsonArray.getJSONObject(0).getString("name");
+                                        contentsPhone = jsonArray.getJSONObject(0).getString("phone");
+                                        contentsText = jsonArray.getJSONObject(0).getString("text");
+                                        contentsSource = jsonArray.getJSONObject(0).getString("source");
                                         // String imei = jsonArray.getJSONObject(0).getString("imei");
 
-                                        callScreenLayout.turnOnContents(name, phone, text, source);
+                                        ContentsFileDownload contentsFileDownload = new ContentsFileDownload(threadReceive, Global.DEFAULT_PATH + File.separator + contentsSource);
+                                        contentsFileDownload.fileDownload();
+
                                     } else {
                                         Toast.makeText(getApplicationContext(), "서버에 등록되지 않은 번호입니다.", Toast.LENGTH_SHORT).show();
                                     }
@@ -374,8 +378,20 @@ public class BackgroundService extends Service {
         }
     }
 
+    private ThreadReceive threadReceive = new ThreadReceive() {
+        @Override
+        public void onReceiveRun(String message) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    callScreenLayout.turnOnContents(contentsName, contentsPhone, contentsText, contentsSource);
+                }
+            });
+        }
+    };
+
     public void setBroadcastReceiver() {
-        Log.i(Global.TAG, "setBroadcastReceiver() 실행!");
+        Log.i(Global.TAG, "setBroadcastReceiver() invoked.");
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Global.INTENT_ACTION_INSERT_RECORDS);
         intentFilter.addAction(Global.INTENT_ACTION_SELECT_RECORDS);

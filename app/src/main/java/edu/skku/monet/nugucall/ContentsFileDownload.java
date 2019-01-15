@@ -35,6 +35,7 @@ class ContentsFileDownload {
     }
 
     void fileDownload() {
+        // TODO: 이미 파일이 존재할 경우 다운로드 생략
         FileDownloadThread fileDownloadThread = new FileDownloadThread();
         fileDownloadThread.start();
     }
@@ -81,11 +82,11 @@ class ContentsFileDownload {
                 parameter.put("fileName", fileName);
                 printWriter.print(parameter.toString());
                 printWriter.flush();
-                Log.i(Global.TAG, "fileName: " + fileName);
+                Log.i(Global.TAG, "파일 다운로드 - fileName: " + fileName);
 
                 // 2. BufferedReader를 통해 서버에서 올 문자열 답변에 대기(readLine()) => 답변으로 "(년월일시분초).확장자" => ContentsDB의 source에 입력될 문자열
                 String message = bufferedReader.readLine();
-                Log.i(Global.TAG, "message: " + message);
+                Log.i(Global.TAG, "파일 다운로드 - JSON message: " + message);
                 JSONObject object = new JSONObject(message);
                 message = object.getString("fileSize");
                 int fileSize = Integer.parseInt(message);
@@ -101,6 +102,8 @@ class ContentsFileDownload {
                 }
                 bufferedOutputStream.flush();
 
+                Log.i(Global.TAG, "파일 다운로드 완료");
+
                 // close
                 bufferedOutputStream.close();
                 bufferedInputStream.close();
@@ -108,7 +111,8 @@ class ContentsFileDownload {
                 printWriter.close();
                 socket.close();
 
-                // TODO: 컨텐츠 띄워주기
+                // BackgroundService onReceive 함수 호출 (컨텐츠 보여주는 기능)
+                threadReceive.onReceiveRun(fileName);
 
             } catch (Exception e) {
                 e.printStackTrace();

@@ -11,7 +11,7 @@ public class CallReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i(Global.TAG, "onReceive() 실행!");
+        Log.i(Global.TAG, "onReceive() invoked.");
 
         SharedPreferences sharedPreferences = context.getSharedPreferences(Global.SHARED_PREFERENCES, Context.MODE_PRIVATE);
 

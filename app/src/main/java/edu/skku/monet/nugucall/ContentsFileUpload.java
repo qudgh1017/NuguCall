@@ -83,12 +83,12 @@ class ContentsFileUpload {
                 parameter.put("fileSize", fileSize);
                 printWriter.print(parameter.toString());
                 printWriter.flush();
-                Log.i(Global.TAG, "fileName: " + fileName);
-                Log.i(Global.TAG, " fileSize: " + fileSize);
+                Log.i(Global.TAG, "파일 업로드 - fileName: " + fileName);
+                Log.i(Global.TAG, "파일 업로드 - fileSize: " + fileSize);
 
                 // 2. BufferedReader를 통해 서버에서 올 문자열 답변에 대기(readLine()) => 답변으로 "(년월일시분초).확장자" => ContentsDB의 source에 입력될 문자열
                 String message = bufferedReader.readLine();
-                Log.i(Global.TAG, "message: " + message);
+                Log.i(Global.TAG, "파일 업로드 - JSON message: " + message);
                 JSONObject object = new JSONObject(message);
                 message = object.getString("fileName");
 
@@ -103,6 +103,8 @@ class ContentsFileUpload {
                 }
                 bufferedOutputStream.flush();
 
+                Log.i(Global.TAG, "파일 업로드 완료");
+
                 // close
                 bufferedOutputStream.close();
                 bufferedInputStream.close();
@@ -110,7 +112,7 @@ class ContentsFileUpload {
                 printWriter.close();
                 socket.close();
 
-                // TODO: 3. contentsActivity.java의 onReceive 함수 호출(컨텐츠 등록 또는 수정하는 기능)
+                // ContentsActivity onReceive 함수 호출 (컨텐츠 등록 또는 수정하는 기능)
                 threadReceive.onReceiveRun(message);
 
             } catch (Exception e) {

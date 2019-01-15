@@ -37,10 +37,10 @@ public class ContentsActivity extends AppCompatActivity {
     // btn_send가 등록인지 수정인지 알기위해 (등록:0, 수정:1)
     int btn_check = 0;
 
-    // TODO: 1. ContentsFileUpload 클래스에 있는 ThreadReceive 인터페이스 생성 및 정의
+    // ContentsFileUpload 클래스에 있는 ThreadReceive 인터페이스 생성 및 정의
     ThreadReceive threadReceive = new ThreadReceive() {
         // onReceiveRun 함수 정의
-        // TODO: 4. onReceiveRun 함수 실행
+        // onReceiveRun 함수 실행
         @Override
         public void onReceiveRun(String message) {
             userSource = message;
@@ -84,7 +84,7 @@ public class ContentsActivity extends AppCompatActivity {
                     userSource = textSource.getText().toString();
 
                     // contents 업로드할 때 쓰는 contentsFileUpload 클래스 생성
-                    // TODO: 2. 생성자에 threadReceive 인터페이스를 변수로 보냄
+                    // 생성자에 threadReceive 인터페이스를 변수로 보냄
                     ContentsFileUpload contentsFileUpload = new ContentsFileUpload(threadReceive, filePath);
 
                     // ContentsDB 등록하기 전 먼저 파일을 서버에 보내기, fileUpload 함수에서 실행하는 fileUploadThread에서 서버와 데이터를 주고받은 후
@@ -141,8 +141,8 @@ public class ContentsActivity extends AppCompatActivity {
             textIMEI.setText(userIMEI);
             textPhoneNumber.setText(userPhoneNumber);
 
-            Log.i(Global.TAG, "IMEI : " + userIMEI);
-            Log.i(Global.TAG, "Phone : " + userPhoneNumber);
+            Log.i(Global.TAG, "컨텐츠 화면 - IMEI : " + userIMEI);
+            Log.i(Global.TAG, "컨텐츠 화면 - Phone : " + userPhoneNumber);
 
             // 처음 컨텐츠 등록된 상태인지 조회하기 위해
             hasContents();
@@ -174,7 +174,6 @@ public class ContentsActivity extends AppCompatActivity {
                                     JSONArray jsonArray = jsonObject.getJSONArray("items");
 
                                     if (jsonArray.length() > 0) {
-                                        Log.i(Global.TAG, "contents exist.");
 
                                         // String id = jsonArray.getJSONObject(0).getString("id");
                                         String name = jsonArray.getJSONObject(0).getString("name");
@@ -183,16 +182,14 @@ public class ContentsActivity extends AppCompatActivity {
                                         String source = jsonArray.getJSONObject(0).getString("source");
                                         // String imei = jsonArray.getJSONObject(0).getString("imei");
 
-                                        // TODO: 이미 등록된 컨텐츠 정보를 띄우고, 수정 버튼으로 변경
+                                        // 이미 등록된 컨텐츠 정보를 띄우고, 수정 버튼으로 변경
                                         btn_check = 1;
                                         btn_send.setText("수정");
                                         textName.setText(name);
                                         textText.setText(text);
                                         textSource.setText(source);
                                     } else {
-                                        Log.i(Global.TAG, "contents not exist.");
-
-                                        // TODO: 새로 컨텐츠를 등록할 수 있게 띄우고, 등록 버튼으로 변경
+                                        // 새로 컨텐츠를 등록할 수 있게 띄우고, 등록 버튼으로 변경
                                         btn_check = 0;
                                         btn_send.setText("등록");
                                         btn_delete.setVisibility(View.GONE);
@@ -386,8 +383,8 @@ public class ContentsActivity extends AppCompatActivity {
             if (resultData != null) {
                 Uri uri = resultData.getData();
                 if (uri != null) {
-                    Log.i(Global.TAG, "Uri: " + uri.getPath());
-                    Log.i(Global.TAG, "Path: " + ContentsFilePath.getPath(getApplicationContext(), uri));
+                    Log.i(Global.TAG, "컨텐츠 화면 - Uri: " + uri.getPath());
+                    Log.i(Global.TAG, "컨텐츠 화면 - Path: " + ContentsFilePath.getPath(getApplicationContext(), uri));
 
                     // filePath
                     filePath = ContentsFilePath.getPath(getApplicationContext(), uri);

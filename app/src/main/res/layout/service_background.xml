@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="10dp"
+    android:background="@drawable/contents_background"
     android:orientation="vertical">
 
     <TextView
@@ -20,6 +20,7 @@
         android:id="@+id/tv_phone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
         android:gravity="center"
         android:text="01089658147"
         android:textColor="#999999"
@@ -29,7 +30,6 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:layout_weight="1">
 
@@ -37,13 +37,16 @@
             android:id="@+id/iv_source"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
             android:contentDescription="source"
+            android:scaleType="center"
             android:visibility="gone" />
 
         <VideoView
             android:id="@+id/vv_source"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
             android:visibility="gone" />
 
     </FrameLayout>
