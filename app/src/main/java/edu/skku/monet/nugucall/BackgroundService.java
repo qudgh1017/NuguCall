@@ -5,10 +5,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
@@ -16,7 +14,6 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneNumberUtils;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -41,10 +38,6 @@ public class BackgroundService extends Service {
 
     private SharedPreferences sharedPreferences;
 
-    private TelephonyManager telephonyManager;
-
-    private boolean isIncomingCall = false;
-
     private WindowManager windowManager;
     private CallScreenLayout callScreenLayout;
     private WindowManager.LayoutParams callScreenLayoutParams;
@@ -57,11 +50,8 @@ public class BackgroundService extends Service {
 
         sharedPreferences = getSharedPreferences(Global.SHARED_PREFERENCES, MODE_PRIVATE);
 
-        telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-
         setNotification();
         setWindowLayout();
-        setBroadcastReceiver();
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -224,66 +214,6 @@ public class BackgroundService extends Service {
             windowManager.removeView(callScreenLayout);
         }
     }
-
-    public void setBroadcastReceiver() {
-        Log.i(Global.TAG, "setBroadcastReceiver() 실행!");
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Intent.ACTION_NEW_OUTGOING_CALL);
-        registerReceiver(broadcastReceiver, intentFilter);
-    }
-
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.i(Global.TAG, "onReceive() 실행!");
-            String phoneNumber;
-
-            // 전화 발신 (안드로이드 버전 8.0 미만) 확인
-            String action = intent.getAction();
-            if (action != null && action.equals(Intent.ACTION_NEW_OUTGOING_CALL)) {
-                Log.i(Global.TAG, "onReceive() if (action != null && action.equals(Intent.ACTION_NEW_OUTGOING_CALL)) 실행!");
-                isIncomingCall = false;
-                phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
-                Log.i(Global.TAG, "전화를 발신했습니다. 수신 번호 : " + phoneNumber + " (below Android Oreo)");
-                insertRecords(phoneNumber);
-            }
-
-            // 전화 발신 (안드로이드 버전 8.0 이상) & 수신 확인
-            switch (telephonyManager.getCallState()) {
-
-                case TelephonyManager.CALL_STATE_RINGING: // 전화 수신
-                    Log.i(Global.TAG, "onReceive()  case TelephonyManager.CALL_STATE_RINGING: 실행!");
-                    isIncomingCall = true;
-                    phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
-                    Log.i(Global.TAG, "전화를 수신했습니다. 발신 번호 : " + phoneNumber);
-                    selectRecords(phoneNumber);
-                    break;
-
-                case TelephonyManager.CALL_STATE_OFFHOOK:
-                    Log.i(Global.TAG, "onReceive()  case TelephonyManager.CALL_STATE_OFFHOOK: 실행!");
-                    if (isIncomingCall) { // 전화 수신 및 통화 시작
-                        Log.i(Global.TAG, "전화를 수신 및 통화가 시작됐습니다.");
-                    } else { // 전화 발신
-                        phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
-                        Log.i(Global.TAG, "전화를 발신했습니다. 수신 번호 : " + phoneNumber + " (above Android Oreo)");
-                        insertRecords(phoneNumber);
-                    }
-                    break;
-
-                case TelephonyManager.CALL_STATE_IDLE:
-                    Log.i(Global.TAG, "onReceive()  case TelephonyManager.CALL_STATE_IDLE: 실행!");
-                    if (isIncomingCall) { // 전화 수신 및 통화 종료
-                        Log.i(Global.TAG, "전화를 수신 및 통화가 종료됐습니다.");
-                        callScreenLayout.turnOffContents();
-                    } else { // 전화 발신 및 통화 종료
-                        Log.i(Global.TAG, "전화를 발신 및 통화가 종료됐습니다.");
-                        callScreenLayout.turnOffContents();
-                    }
-                    break;
-
-            }
-        }
-    };
 
     public void insertRecords(final String phoneNumber) {
         // TODO: 발신했을 경우 발신 기록을 DB에 삽입
