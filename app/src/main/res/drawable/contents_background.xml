@@ -11,3 +11,5 @@
         android:top="10dp" />
     <corners android:radius="4dp" />
 </shape>
+
+<!-- service_background.xml에서 LinearLayout에서 배경 꾸미기 android:background="@drawable/contents_background" -->

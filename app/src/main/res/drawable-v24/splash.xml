@@ -10,3 +10,9 @@
         <bitmap android:src="@drawable/icon" />
     </item>
 </layer-list>
+
+<!--
+splash 화면 디자인
+layer-list 안에 item 넣을 수 있음
+bitmap 이미지 불러오기 위한것 @drawable(폴더명), icon(파일명)
+-->

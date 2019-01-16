@@ -48,6 +48,8 @@ public class SplashActivity extends AppCompatActivity {
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             checkStoragePermission();
         } else {
+            // 권한 요청 화면 띄우는 것
+            // 권한 요청 허용 또는 거부 선택시 무조건 onRequestPermissionsResult() 실행됨
             ActivityCompat.requestPermissions(SplashActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, Global.REQ_CODE_PERMISSION_PHONE);
         }
     }
@@ -67,7 +69,10 @@ public class SplashActivity extends AppCompatActivity {
                 goToContentsActivity();
             } else {
                 Toast.makeText(getApplicationContext(), "다른 앱 위에 그리기 권한이 필요합니다.", Toast.LENGTH_LONG).show();
+                // getPacakageName() 패키지 이름(edu.skk.monet.nugucall)
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+                // startActivity 하는거와 동시에 결과값을 돌려받기위해 하는 함수
+                // 종료될 때 무조건 onActivityResult() 실행됨
                 startActivityForResult(intent, Global.REQ_CODE_PERMISSION_OVERLAY);
             }
         }
@@ -88,23 +93,25 @@ public class SplashActivity extends AppCompatActivity {
         sharedPreferences.edit().putInt(Global.SHARED_PREFERENCES_WIDTH, full_width * 7 / 10).apply(); // 가로 해상도의 7/10
         sharedPreferences.edit().putInt(Global.SHARED_PREFERENCES_HEIGHT, full_height * 4 / 10).apply(); // 세로 해상도의 4/10
 
-        // 누구콜 전용 컨텐츠 폴더를 생성하기
+        // 발신/수신시 다운로드 받은 컨텐츠를 저장할 누구콜 전용 폴더를 생성하기
         File file = new File(Global.DEFAULT_PATH);
-        if (file.exists()) {
+        if (file.exists()) { // 누구콜 폴더 존재하면
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    // 컨텐츠 액티비티 실행
                     Intent intent = new Intent(getApplicationContext(), ContentsActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     finish();
                 }
             }, 1500);
-        } else {
-            if (file.mkdir()) {
+        } else { // 누구콜 폴더 존재x
+            if (file.mkdir()) { // 누구콜 폴더 생성
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        // 컨텐츠 액티비티 실행
                         Intent intent = new Intent(getApplicationContext(), ContentsActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
@@ -123,12 +130,13 @@ public class SplashActivity extends AppCompatActivity {
         }
     }
 
+    // 권한 요청창에서 허용이나 거부 선택시 무조건 실행되는 함수
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == Global.REQ_CODE_PERMISSION_PHONE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) { // 허용 선택시
                 checkStoragePermission();
-            } else {
+            } else { // 거부 선택시
                 finish();
             }
         } else if (requestCode == Global.REQ_CODE_PERMISSION_STORAGE) {
@@ -141,6 +149,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+    // startActivityForResult()로 실행한 화면이 종료될 때 실행
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == Global.REQ_CODE_PERMISSION_OVERLAY) {
@@ -155,8 +164,10 @@ public class SplashActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    // 서비스가 이미 실행되고 있는 상태인지 확인
     public boolean isServiceRunning() {
         ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        // 핸드폰에서 실행중인 모든 서비스를 찾는다.
         for (ActivityManager.RunningServiceInfo runningServiceInfo : activityManager.getRunningServices(Integer.MAX_VALUE)) {
             if (runningServiceInfo.service.getClassName().equals("edu.skku.monet.nugucall.BackgroundService")) {
                 return true;
@@ -165,8 +176,10 @@ public class SplashActivity extends AppCompatActivity {
         return false;
     }
 
+    // 뒤로가기 눌렀을 경우
     @Override
     public void onBackPressed() {
-
+        // splash 화면일 때 뒤로가기 버튼이 안되어야 하므로 주석처리함.
+        // super.onBackPressed();
     }
 }
