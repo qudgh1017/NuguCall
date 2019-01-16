@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="ultra_violet">#654FA1</color>
-    <color name="ultra_violet_dark">#604B89</color>
+    <color name="ultra_blue">#1428a0</color>
+    <color name="ultra_blue_dark">#0a1478</color>
     <color name="living_coral">#FF7062</color>
 
     <color name="white">#FAFAFA</color>
