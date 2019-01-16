@@ -56,6 +56,7 @@ public class BackgroundService extends Service {
     private String contentsPhone;
     private String contentsText;
     private String contentsSource;
+    private String contentsSize;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -322,6 +323,18 @@ public class BackgroundService extends Service {
         }
     }
 
+    private ThreadReceive downloadThreadReceive = new ThreadReceive() {
+        @Override
+        public void onReceiveRun(String fileName, long fileSize) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    callScreenLayout.turnOnContents(contentsName, contentsPhone, contentsText, contentsSource);
+                }
+            });
+        }
+    };
+
     public void selectYourContents(String phoneNumber) {
         Log.i(Global.TAG, "selectYourContents() invoked.");
 
@@ -353,10 +366,17 @@ public class BackgroundService extends Service {
                                         contentsPhone = jsonArray.getJSONObject(0).getString("phone");
                                         contentsText = jsonArray.getJSONObject(0).getString("text");
                                         contentsSource = jsonArray.getJSONObject(0).getString("source");
+                                        contentsSize = jsonArray.getJSONObject(0).getString("size");
                                         // String imei = jsonArray.getJSONObject(0).getString("imei");
 
-                                        ContentsFileDownload contentsFileDownload = new ContentsFileDownload(threadReceive, Global.DEFAULT_PATH + File.separator + contentsSource);
-                                        contentsFileDownload.fileDownload();
+                                        String filePath = Global.DEFAULT_PATH + File.separator + contentsSource;
+                                        File file = new File(filePath);
+                                        if (!file.exists()) {
+                                            ContentsFileDownload contentsFileDownload = new ContentsFileDownload(downloadThreadReceive, filePath, contentsSize);
+                                            contentsFileDownload.fileDownload();
+                                        } else {
+                                            callScreenLayout.turnOnContents(contentsName, contentsPhone, contentsText, contentsSource);
+                                        }
 
                                     } else {
                                         Toast.makeText(getApplicationContext(), "서버에 등록되지 않은 번호입니다.", Toast.LENGTH_SHORT).show();
@@ -377,18 +397,6 @@ public class BackgroundService extends Service {
             e.printStackTrace();
         }
     }
-
-    private ThreadReceive threadReceive = new ThreadReceive() {
-        @Override
-        public void onReceiveRun(String message) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    callScreenLayout.turnOnContents(contentsName, contentsPhone, contentsText, contentsSource);
-                }
-            });
-        }
-    };
 
     public void setBroadcastReceiver() {
         Log.i(Global.TAG, "setBroadcastReceiver() invoked.");

@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -25,7 +26,9 @@ import org.json.JSONObject;
 
 public class ContentsActivity extends AppCompatActivity {
 
-    String userName = "", userText = "", userSource = "";
+    private Handler handler;
+
+    String userName = "", userText = "", userSource = "", userSize = "";
     // 폰 정보 불러온 값을 저장할 변수
     String userIMEI = "", userPhoneNumber = "";
     String filePath = "";
@@ -37,13 +40,17 @@ public class ContentsActivity extends AppCompatActivity {
     // btn_send가 등록인지 수정인지 알기위해 (등록:0, 수정:1)
     int btn_check = 0;
 
-    // ContentsFileUpload 클래스에 있는 ThreadReceive 인터페이스 생성 및 정의
-    ThreadReceive threadReceive = new ThreadReceive() {
-        // onReceiveRun 함수 정의
-        // onReceiveRun 함수 실행
+    private ThreadReceive uploadThreadReceive = new ThreadReceive() {
         @Override
-        public void onReceiveRun(String message) {
-            userSource = message;
+        public void onReceiveRun(String fileName, long fileSize) {
+            userSource = fileName;
+            userSize = String.valueOf(fileSize);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    textSource.setText(userSource);
+                }
+            });
             // contents 업로드 성공하면 등록 또는 수정
             if (btn_check == 0) { // 등록 버튼일 경우
                 insertContents();
@@ -57,6 +64,8 @@ public class ContentsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contents);
+
+        handler = new Handler(getMainLooper());
 
         textName = findViewById(R.id.textName);
         textText = findViewById(R.id.textText);
@@ -85,7 +94,7 @@ public class ContentsActivity extends AppCompatActivity {
 
                     // contents 업로드할 때 쓰는 contentsFileUpload 클래스 생성
                     // 생성자에 threadReceive 인터페이스를 변수로 보냄
-                    ContentsFileUpload contentsFileUpload = new ContentsFileUpload(threadReceive, filePath);
+                    ContentsFileUpload contentsFileUpload = new ContentsFileUpload(uploadThreadReceive, filePath);
 
                     // ContentsDB 등록하기 전 먼저 파일을 서버에 보내기, fileUpload 함수에서 실행하는 fileUploadThread에서 서버와 데이터를 주고받은 후
                     // insertContents()와 updateContents()함수를 실행하는 threadReceive.onReceiveRun(message)를 실행
@@ -141,9 +150,6 @@ public class ContentsActivity extends AppCompatActivity {
             textIMEI.setText(userIMEI);
             textPhoneNumber.setText(userPhoneNumber);
 
-            Log.i(Global.TAG, "컨텐츠 화면 - IMEI : " + userIMEI);
-            Log.i(Global.TAG, "컨텐츠 화면 - Phone : " + userPhoneNumber);
-
             // 처음 컨텐츠 등록된 상태인지 조회하기 위해
             hasContents();
 
@@ -172,14 +178,13 @@ public class ContentsActivity extends AppCompatActivity {
                             switch (result) {
                                 case "1": // JSP - DB 통신 성공
                                     JSONArray jsonArray = jsonObject.getJSONArray("items");
-
                                     if (jsonArray.length() > 0) {
-
                                         // String id = jsonArray.getJSONObject(0).getString("id");
                                         String name = jsonArray.getJSONObject(0).getString("name");
                                         // String phone = jsonArray.getJSONObject(0).getString("phone");
                                         String text = jsonArray.getJSONObject(0).getString("text");
                                         String source = jsonArray.getJSONObject(0).getString("source");
+                                        // String size = jsonArray.getJSONObject(0).getString("size");
                                         // String imei = jsonArray.getJSONObject(0).getString("imei");
 
                                         // 이미 등록된 컨텐츠 정보를 띄우고, 수정 버튼으로 변경
@@ -225,6 +230,7 @@ public class ContentsActivity extends AppCompatActivity {
             parameter.put("phone", userPhoneNumber);
             parameter.put("text", userText);
             parameter.put("source", userSource);
+            parameter.put("size", userSize);
             parameter.put("imei", userIMEI);
 
             CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {
@@ -274,6 +280,7 @@ public class ContentsActivity extends AppCompatActivity {
             parameter.put("phone", userPhoneNumber);
             parameter.put("text", userText);
             parameter.put("source", userSource);
+            parameter.put("size", userSize);
             parameter.put("imei", userIMEI);
 
             CommunicateDB communicateDB = new CommunicateDB(address, parameter, new CallbackDB() {

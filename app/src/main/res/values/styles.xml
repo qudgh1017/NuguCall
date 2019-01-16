@@ -3,13 +3,13 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/ultra_blue</item>
         <item name="colorPrimaryDark">@color/ultra_blue_dark</item>
-        <item name="colorAccent">@color/living_coral</item>
+        <item name="colorAccent">@color/tangerine_tango</item>
     </style>
 
     <style name="AppTheme.Splash" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/ultra_blue</item>
         <item name="colorPrimaryDark">@color/ultra_blue_dark</item>
-        <item name="colorAccent">@color/living_coral</item>
+        <item name="colorAccent">@color/tangerine_tango</item>
         <item name="android:windowBackground">@drawable/splash</item>
         <item name="android:windowNoTitle">true</item>
     </style>

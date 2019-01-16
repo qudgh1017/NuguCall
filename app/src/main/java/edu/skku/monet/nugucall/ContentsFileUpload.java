@@ -76,21 +76,18 @@ class ContentsFileUpload {
 
                 String fileName = file.getName();
                 long fileSize = file.length();
-
                 // 1. 보내려는 파일 이름과 파일 크기 JSONObject에 담아서 PrintWriter(문자열)로 서버에 보내기, 보내준 거(printWriter) flush 해주기
-                JSONObject parameter = new JSONObject();
-                parameter.put("fileName", fileName);
-                parameter.put("fileSize", fileSize);
-                printWriter.print(parameter.toString());
+                JSONObject putMessage = new JSONObject();
+                putMessage.put("fileName", fileName);
+                putMessage.put("fileSize", fileSize);
+                printWriter.print(putMessage.toString());
                 printWriter.flush();
-                Log.i(Global.TAG, "파일 업로드 - fileName: " + fileName);
-                Log.i(Global.TAG, "파일 업로드 - fileSize: " + fileSize);
 
-                // 2. BufferedReader를 통해 서버에서 올 문자열 답변에 대기(readLine()) => 답변으로 "(년월일시분초).확장자" => ContentsDB의 source에 입력될 문자열
-                String message = bufferedReader.readLine();
-                Log.i(Global.TAG, "파일 업로드 - JSON message: " + message);
-                JSONObject object = new JSONObject(message);
-                message = object.getString("fileName");
+                // 2. BufferedReader를 통해 서버에서 올 문자열 답변에 대기(readLine())
+                String getMessage = bufferedReader.readLine();
+                Log.i(Global.TAG, "Waiting in File Upload: " + getMessage);
+                JSONObject object = new JSONObject(getMessage);
+                fileName = object.getString("fileName");
 
                 // 3. BufferedInputStream을 통해 파일을 읽음과 동시에 BufferedOutputStream을 통해 파일을 서버로 전송
                 // 보내준 거(bufferedOutputStream) flush 해주기
@@ -102,18 +99,37 @@ class ContentsFileUpload {
                     check += length;
                 }
                 bufferedOutputStream.flush();
-
-                Log.i(Global.TAG, "파일 업로드 완료");
+                Log.i(Global.TAG, "File Upload Completed.");
 
                 // close
-                bufferedOutputStream.close();
-                bufferedInputStream.close();
-                bufferedReader.close();
-                printWriter.close();
-                socket.close();
+                try {
+                    bufferedOutputStream.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    bufferedInputStream.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    bufferedReader.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    printWriter.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    socket.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
                 // ContentsActivity onReceive 함수 호출 (컨텐츠 등록 또는 수정하는 기능)
-                threadReceive.onReceiveRun(message);
+                threadReceive.onReceiveRun(fileName, fileSize);
 
             } catch (Exception e) {
                 e.printStackTrace();
