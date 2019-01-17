@@ -41,7 +41,7 @@ class ContentsFileDownload {
         fileDownloadThread.start();
     }
 
-    // 파일 업로드 스레드
+    // 파일 다운로드 스레드
     private class FileDownloadThread extends Thread {
         @Override
         public void run() {
@@ -79,7 +79,7 @@ class ContentsFileDownload {
                 String fileName = file.getName();
                 long fileSize = Long.parseLong(size);
 
-                // 1. 보내려는 파일 이름과 파일 크기 JSONObject에 담아서 PrintWriter(문자열)로 서버에 보내기, 보내준 거(printWriter) flush 해주기
+                // 1. 다운받으려는 파일 이름과 파일 크기 JSONObject에 담아서 PrintWriter(문자열)로 서버에 보내기, 보내준 거(printWriter) flush 해주기
                 JSONObject putMessage = new JSONObject();
                 putMessage.put("fileName", fileName);
                 putMessage.put("fileSize", fileSize);
