@@ -26,7 +26,7 @@ public class CallReceiver extends BroadcastReceiver {
             Log.i(Global.TAG, "전화를 발신했습니다. 수신 번호 : " + phoneNumber + " (below Android Oreo)");
             i = new Intent(Global.INTENT_ACTION_INSERT_RECORDS);
             i.putExtra(Global.INTENT_EXTRA_PHONE_NUMBER, phoneNumber);
-            context.sendBroadcast(i);
+            context.sendBroadcast(i); // BackgroundService로 인텐트 발신
         }
 
         // 전화 발신 (안드로이드 버전 8.0 이상) & 수신 확인
@@ -38,7 +38,7 @@ public class CallReceiver extends BroadcastReceiver {
                 Log.i(Global.TAG, "전화를 수신했습니다. 발신 번호 : " + phoneNumber);
                 i = new Intent(Global.INTENT_ACTION_SELECT_RECORDS);
                 i.putExtra(Global.INTENT_EXTRA_PHONE_NUMBER, phoneNumber);
-                context.sendBroadcast(i);
+                context.sendBroadcast(i); // BackgroundService로 인텐트 발신
                 break;
 
             case TelephonyManager.CALL_STATE_OFFHOOK:
@@ -49,7 +49,7 @@ public class CallReceiver extends BroadcastReceiver {
                     Log.i(Global.TAG, "전화를 발신했습니다. 수신 번호 : " + phoneNumber + " (above Android Oreo)");
                     i = new Intent(Global.INTENT_ACTION_INSERT_RECORDS);
                     i.putExtra(Global.INTENT_EXTRA_PHONE_NUMBER, phoneNumber);
-                    context.sendBroadcast(i);
+                    context.sendBroadcast(i); // BackgroundService로 인텐트 발신
                 }
                 break;
 
@@ -58,11 +58,11 @@ public class CallReceiver extends BroadcastReceiver {
                     sharedPreferences.edit().putBoolean(Global.SHARED_PREFERENCES_INCOMING, false).apply();
                     Log.i(Global.TAG, "전화를 수신 및 통화가 종료됐습니다.");
                     i = new Intent(Global.INTENT_ACTION_TURN_OFF_CONTENTS);
-                    context.sendBroadcast(i);
+                    context.sendBroadcast(i); // BackgroundService로 인텐트 발신
                 } else { // 전화 발신 및 통화 종료
                     Log.i(Global.TAG, "전화를 발신 및 통화가 종료됐습니다.");
                     i = new Intent(Global.INTENT_ACTION_TURN_OFF_CONTENTS);
-                    context.sendBroadcast(i);
+                    context.sendBroadcast(i); // BackgroundService로 인텐트 발신
                 }
                 break;
 
