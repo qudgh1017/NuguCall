@@ -11,7 +11,7 @@ public class PreviewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview);
     }
-    
+
     public void previewContents() {
         Intent i = new Intent(Global.INTENT_ACTION_PREVIEW_CONTENTS);
         // i.putExtra(Global.INTENT_EXTRA_PHONE_NUMBER, phoneNumber); // 데이터 보내기
