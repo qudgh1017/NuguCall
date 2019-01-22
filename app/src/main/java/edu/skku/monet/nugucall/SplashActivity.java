@@ -83,13 +83,13 @@ public class SplashActivity extends AppCompatActivity {
         int status_bar_height = 0;
         int resource_identifier = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resource_identifier > 0) {
-            status_bar_height = getResources().getDimensionPixelSize(resource_identifier);
+            status_bar_height = getResources().getDimensionPixelSize(resource_identifier); // 알림바 높이
         }
         Point point = new Point();
         Display display = getWindowManager().getDefaultDisplay();
         display.getRealSize(point);
-        int full_width = point.x;
-        int full_height = point.y - status_bar_height;
+        int full_width = point.x; // 가로 해상도
+        int full_height = point.y - status_bar_height; // 세로 해상도 - 알림바 높이
         sharedPreferences.edit().putInt(Global.SHARED_PREFERENCES_WIDTH, full_width * 7 / 10).apply(); // 가로 해상도의 7/10
         sharedPreferences.edit().putInt(Global.SHARED_PREFERENCES_HEIGHT, full_height * 4 / 10).apply(); // 세로 해상도의 4/10
 
