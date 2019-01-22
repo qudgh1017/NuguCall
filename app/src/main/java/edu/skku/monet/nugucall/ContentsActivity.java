@@ -133,7 +133,7 @@ public class ContentsActivity extends AppCompatActivity {
             }
         });
 
-        // 미리보기 버튼 누른 경우
+        // 미리보기 버튼 누른 경우(등록된 상태에서만 보이게)
         btn_PreviewActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -204,10 +204,11 @@ public class ContentsActivity extends AppCompatActivity {
                                         textText.setText(text);
                                         textSource.setText(source);
                                     } else {
-                                        // 새로 컨텐츠를 등록할 수 있게 띄우고, 등록 버튼으로 변경
+                                        // 새로 컨텐츠를 등록할 수 있게 띄우고, 등록 버튼으로 변경하고 삭제, 미리보기 버튼은 안보이게
                                         btn_check = 0;
                                         btn_send.setText("등록");
                                         btn_delete.setVisibility(View.GONE);
+                                        btn_PreviewActivity.setVisibility(View.GONE);
                                     }
                                     break;
 
@@ -255,10 +256,11 @@ public class ContentsActivity extends AppCompatActivity {
                                 case "1": // JSP - DB 통신 성공
                                     Toast.makeText(getApplicationContext(), "컨텐츠가 등록되었습니다.", Toast.LENGTH_SHORT).show();
 
-                                    // 등록되면 수정으로 바꿔주고 삭제버튼 보이게
+                                    // 등록되면 수정으로 바꿔주고 삭제버튼, 컨텐츠화면 미리보기버튼 보이게
                                     btn_check = 1;
                                     btn_send.setText("수정");
                                     btn_delete.setVisibility(View.VISIBLE);
+                                    btn_PreviewActivity.setVisibility(View.VISIBLE);
                                     break;
 
                                 case "0": // JSP - DB 통신 오류 발생
