@@ -101,11 +101,21 @@
                 android:textStyle="normal" />
 
             <Button
-                android:id="@+id/btn_fileUpload"
+            android:id="@+id/btn_fileUpload"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@null"
+            android:text="파일 선택"
+            android:textColor="@color/tangerine_tango"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_PreviewActivity"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:background="@null"
-                android:text="파일 선택"
+                android:text="미리보기"
                 android:textColor="@color/tangerine_tango"
                 android:textSize="16sp"
                 android:textStyle="bold" />

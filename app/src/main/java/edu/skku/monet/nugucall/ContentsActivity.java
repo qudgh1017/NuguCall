@@ -35,7 +35,7 @@ public class ContentsActivity extends AppCompatActivity {
     // 서버에 보낼 값, 폰 정보 불러온 값을 보여줄 TextView
     EditText textName, textText;
     TextView textPhoneNumber, textIMEI, textSource;
-    Button btn_send, btn_reset, btn_delete, btn_fileUpload;
+    Button btn_send, btn_reset, btn_delete, btn_fileUpload, btn_PreviewActivity;
 
     // btn_send가 등록인지 수정인지 알기위해 (등록:0, 수정:1)
     int btn_check = 0;
@@ -76,6 +76,7 @@ public class ContentsActivity extends AppCompatActivity {
         btn_reset = findViewById(R.id.btn_reset);
         btn_delete = findViewById(R.id.btn_delete);
         btn_fileUpload = findViewById(R.id.btn_fileUpload);
+        btn_PreviewActivity = findViewById(R.id.btn_PreviewActivity);
 
         // 폰 정보 불러오기 (userIMEI, userPhoneNumber)
         getUserPhoneInformation();
@@ -129,6 +130,15 @@ public class ContentsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 performFileSearch();
+            }
+        });
+
+        // 미리보기 버튼 누른 경우
+        btn_PreviewActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), PreviewActivity.class);
+                startActivity(intent);
             }
         });
     }
