@@ -66,6 +66,13 @@ public class BackgroundService extends Service {
     private String contentsSource;
     private String contentsSize;
 
+    //프리뷰 콜백을 위한 String
+    private String contentsNamePreview;
+    private String contentsPhonePreview;
+    private String contentsTextPreview;
+    private String contentsSourcePreview;
+    private String contentsSizePreview;
+
     // 서비스가 처음 시작될 때 실행
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -81,6 +88,32 @@ public class BackgroundService extends Service {
 
         return super.onStartCommand(intent, flags, startId);
     }
+
+    //파일 다운로드 콜백
+    private ThreadReceive downloadThreadReceive = new ThreadReceive() {
+        @Override
+        public void onReceiveRun(String fileName, long fileSize) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    callScreenLayout.turnOnContents(contentsName, contentsPhone, contentsText, contentsSource);
+                }
+            });
+        }
+    };
+
+    //프리뷰 파일 다운로드 콜백
+    private ThreadReceive downloadThreadReceivePreview = new ThreadReceive() {
+        @Override
+        public void onReceiveRun(String fileName, long fileSize) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    callScreenLayout.turnOnpreviewContents(contentsNamePreview, contentsPhonePreview, contentsTextPreview, contentsSourcePreview, contentsSizePreview);
+                }
+            });
+        }
+    };
 
     // 알림바 선언
     public void setNotification() {
@@ -155,6 +188,7 @@ public class BackgroundService extends Service {
         private TextView tv_text; // 문구
 
         private boolean isShowing = false; // 컨텐츠가 보여지고 있는지
+        private boolean isShowingPreview = false; // 미리보기가 보여지고 있는지
 
         public CallScreenLayout(Context context) {
             super(context);
@@ -268,8 +302,97 @@ public class BackgroundService extends Service {
             windowManager.removeView(callScreenLayout);
         }
 
-        public void previewContents() {
+        //미리보기 화면 띄우기
+        public void turnOnpreviewContents(String name, String phone, String text, String source, String size) {
+            Log.i(Global.TAG, "turnOnpreviewContents() invoked.");
 
+            // source : 파일이름.확장자
+            // 안드로이드 기본 경로는 /storage/emulated/0/NuguCall
+            // 종합 경로 : /storage/emulated/0/NuguCall/"파일이름.확장자"
+            String filePath = Global.DEFAULT_PATH + File.separator + source;
+            File file = new File(filePath);
+
+            // 해당 파일이 존재하지 않는 경우 다운로드 실행
+            if (!file.exists()) {
+                //콜백의 arguments로 사용됨
+                contentsNamePreview = name;
+                contentsPhonePreview = phone;
+                contentsTextPreview = text;
+                contentsSourcePreview = source;
+                contentsSizePreview = size;
+
+                //파일 다운로드 후 콜백을 통해서 turnOnpreviewContents를 다시 한번 부르게됨
+                ContentsFileDownload contentsFileDownloadPreview = new ContentsFileDownload(downloadThreadReceivePreview, filePath, size);
+                contentsFileDownloadPreview.fileDownload();
+                return;
+            }
+
+            // 파일 성질 알아내기 (image/png) (video/mp4)
+            String mimeType = URLConnection.guessContentTypeFromName(filePath);
+            // 슬래시 앞에 것 따오기
+            mimeType = mimeType.substring(0, mimeType.indexOf("/"));
+
+            if (isShowingPreview) {
+                return;
+            }
+            isShowingPreview = true;
+
+            tv_name.setText(name);
+            tv_phone.setText(PhoneNumberUtils.formatNumber(phone));
+            tv_text.setText(text);
+
+            // 팝업 창 보이기
+            windowManager.addView(callScreenLayout, callScreenLayoutParams);
+
+            switch (mimeType) {
+
+                case "image":
+                    iv_source.setVisibility(View.VISIBLE);
+                    // 이미지 띄워주는 라이브러리
+                    RequestOptions requestOptions = new RequestOptions().centerCrop().placeholder(R.drawable.icon).error(R.mipmap.ic_launcher);
+                    Glide.with(getApplicationContext()).load(file).apply(requestOptions).into(iv_source);
+                    break;
+
+                case "video":
+                    vv_source.setVisibility(View.VISIBLE);
+                    // 비디오 파일 위치
+                    vv_source.setVideoPath(file.getPath());
+                    // 재생이 완료됐을 경우
+                    vv_source.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            // 재생
+                            vv_source.start();
+                        }
+                    });
+                    // 재생
+                    vv_source.start();
+                    break;
+
+                default:
+                    Toast.makeText(getApplicationContext(), "지원하지 않는 파일입니다.", Toast.LENGTH_SHORT).show();
+                    break;
+
+            }
+        }
+
+        //미리보기 화면 끄기
+        public void turnOffpreviewContents() {
+            Log.i(Global.TAG, "turnOffpreviewContents() invoked.");
+            if (!isShowingPreview) {
+                return;
+            }
+            isShowingPreview = false;
+
+            // 다시 다 안 보이게
+            iv_source.setVisibility(View.GONE);
+            vv_source.setVisibility(View.GONE);
+            // 비디오가 재생 중이면 정지
+            if (vv_source.isPlaying()) {
+                vv_source.stopPlayback();
+            }
+            // 팝업 창 끄기
+            windowManager.removeView(callScreenLayout);
         }
     }
 
@@ -365,17 +488,6 @@ public class BackgroundService extends Service {
         }
     }
 
-    private ThreadReceive downloadThreadReceive = new ThreadReceive() {
-        @Override
-        public void onReceiveRun(String fileName, long fileSize) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    callScreenLayout.turnOnContents(contentsName, contentsPhone, contentsText, contentsSource);
-                }
-            });
-        }
-    };
 
     public void selectYourContents(String phoneNumber) {
         Log.i(Global.TAG, "selectYourContents() invoked.");
@@ -450,7 +562,8 @@ public class BackgroundService extends Service {
         intentFilter.addAction(Global.INTENT_ACTION_INSERT_RECORDS);
         intentFilter.addAction(Global.INTENT_ACTION_SELECT_RECORDS);
         intentFilter.addAction(Global.INTENT_ACTION_TURN_OFF_CONTENTS);
-        intentFilter.addAction(Global.INTENT_ACTION_PREVIEW_CONTENTS);
+        intentFilter.addAction(Global.INTENT_ACTION_PREVIEW_CONTENTS_ON);
+        intentFilter.addAction(Global.INTENT_ACTION_PREVIEW_CONTENTS_OFF);
         // 브로드캐스트 리시버 & 인텐트 필터 등록
         // 브로드캐스트 리시버 & 인텐트 필터 등록을 안 하면 broadcastReceiver의 onReceive가 호출이 안 됨
         registerReceiver(broadcastReceiver, intentFilter);
@@ -473,8 +586,17 @@ public class BackgroundService extends Service {
                     case Global.INTENT_ACTION_TURN_OFF_CONTENTS:
                         callScreenLayout.turnOffContents();
                         break;
-                    case Global.INTENT_ACTION_PREVIEW_CONTENTS:
-                        callScreenLayout.previewContents();
+                    case Global.INTENT_ACTION_PREVIEW_CONTENTS_ON:
+                        //PreviewActivity로부터 넘어온 String들을 받아서 callScreenLayout.previeContents호출
+                        String i_name = intent.getStringExtra(Global.INTENT_EXTRA_NAME);
+                        String i_phone = intent.getStringExtra(Global.INTENT_EXTRA_PHONE_NUMBER);
+                        String i_text = intent.getStringExtra(Global.INTENT_EXTRA_TEXT);
+                        String i_source = intent.getStringExtra(Global.INTENT_EXTRA_SOURCE);
+                        String i_size = intent.getStringExtra(Global.INTENT_EXTRA_SOURCE);
+                        callScreenLayout.turnOnpreviewContents(i_name, i_phone, i_text, i_source, i_size);
+                        break;
+                    case Global.INTENT_ACTION_PREVIEW_CONTENTS_OFF:
+                        callScreenLayout.turnOffpreviewContents();
                         break;
                 }
             }

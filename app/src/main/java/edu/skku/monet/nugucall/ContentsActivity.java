@@ -164,10 +164,11 @@ public class ContentsActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), PreviewActivity.class);
 
                 // 미리보기 화면을 띄우기 위해 필요한 정보 전달
-                //intent.putExtra(Global.INTENT_EXTRA_NAME, textName.getText());
-                //intent.putExtra(Global.INTENT_EXTRA_PHONE_NUMBER, textPhoneNumber.getText());
-                //intent.putExtra(Global.INTENT_EXTRA_TEXT, textText.getText());
-                //intent.putExtra(Global.INTENT_EXTRA_SOURCE, textSource.getText());
+                intent.putExtra(Global.INTENT_EXTRA_NAME, userName);
+                intent.putExtra(Global.INTENT_EXTRA_PHONE_NUMBER, userPhoneNumber);
+                intent.putExtra(Global.INTENT_EXTRA_TEXT, userText);
+                intent.putExtra(Global.INTENT_EXTRA_SOURCE, userSource);
+                intent.putExtra(Global.INTENT_EXTRA_SIZE, userSize);
 
                 startActivity(intent);
             }
