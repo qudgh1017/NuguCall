@@ -171,6 +171,7 @@ public class ContentsActivity extends AppCompatActivity {
                 intent.putExtra(Global.INTENT_EXTRA_SIZE, userSize);
 
                 startActivity(intent);
+
             }
         });
     }
