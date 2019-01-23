@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -139,6 +140,13 @@ public class ContentsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), PreviewActivity.class);
+
+                // 미리보기 화면을 띄우기 위해 필요한 정보 전달
+                intent.putExtra("name", textName.getText());
+                intent.putExtra("phone", textPhoneNumber.getText());
+                intent.putExtra("text", textText.getText());
+                intent.putExtra("source", textSource.getText());
+
                 startActivity(intent);
             }
         });
@@ -425,6 +433,13 @@ public class ContentsActivity extends AppCompatActivity {
                     }
                 }
             }
+        }
+    }
+
+    public void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, Global.REQ_IMAGE_CAPTURE);
         }
     }
 }

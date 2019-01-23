@@ -100,15 +100,23 @@
                 android:textSize="16sp"
                 android:textStyle="normal" />
 
-            <Button
-            android:id="@+id/btn_fileUpload"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@null"
-            android:text="파일 선택"
-            android:textColor="@color/tangerine_tango"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <Button
+                    android:id="@+id/btn_fileUpload"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@null"
+                    android:text="파일 첨부"
+                    android:textColor="@color/tangerine_tango"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
             <Button
                 android:id="@+id/btn_PreviewActivity"
