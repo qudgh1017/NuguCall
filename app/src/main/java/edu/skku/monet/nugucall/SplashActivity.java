@@ -142,6 +142,7 @@ public class SplashActivity extends AppCompatActivity {
     // 권한 요청창에서 허용이나 거부 선택시 무조건 실행되는 함수
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        // phone정보, 저장소, 카메라, 앱 위에 그리기 순으로
         if (requestCode == Global.REQ_CODE_PERMISSION_PHONE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) { // 허용 선택시
                 checkStoragePermission();

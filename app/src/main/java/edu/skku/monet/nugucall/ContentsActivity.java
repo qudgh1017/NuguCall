@@ -1,18 +1,24 @@
 package edu.skku.monet.nugucall;
 /*
-    2019.01.12
-    by 유병호
+    2019.01.12 by 유병호
     컨텐츠 등록, 수정, 삭제, 초기화, 파일첨부, 문서검색 기능
+    2019.01.23
+    사진 찍기 기능 추가
 */
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -26,6 +32,10 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URLConnection;
+
 public class ContentsActivity extends AppCompatActivity {
 
     private Handler handler;
@@ -37,7 +47,11 @@ public class ContentsActivity extends AppCompatActivity {
     // 서버에 보낼 값, 폰 정보 불러온 값을 보여줄 TextView
     EditText textName, textText;
     TextView textPhoneNumber, textIMEI, textSource;
-    Button btn_send, btn_reset, btn_delete, btn_fileUpload, btn_PreviewActivity, btn_takePicture;
+    Button btn_send, btn_reset, btn_delete, btn_fileUpload, btn_PreviewActivity;
+
+    // 사진 찍기 기능
+    private Uri imgUri, photoURI, albumURI;
+    private String mCurrentPhotoPath;
 
     // btn_send가 등록인지 수정인지 알기위해 (등록:0, 수정:1)
     int btn_check = 0;
@@ -79,7 +93,6 @@ public class ContentsActivity extends AppCompatActivity {
         btn_delete = findViewById(R.id.btn_delete);
         btn_fileUpload = findViewById(R.id.btn_fileUpload);
         btn_PreviewActivity = findViewById(R.id.btn_PreviewActivity);
-        btn_takePicture = findViewById(R.id.btn_takePicture);
 
         // 폰 정보 불러오기 (userIMEI, userPhoneNumber)
         getUserPhoneInformation();
@@ -129,10 +142,18 @@ public class ContentsActivity extends AppCompatActivity {
         });
 
         // 파일첨부 버튼 누른 경우 문서 제공자 함수 호출
-        btn_fileUpload.setOnClickListener(new View.OnClickListener() {
+        /*btn_fileUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 performFileSearch();
+            }
+        });*/
+
+        // 파일 첨부 버튼 누른 경우 AlertDialog 생성(앨범 선택, 사진 찍기, 동영상 찍기, 취소)
+        btn_fileUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                makeDialog();
             }
         });
 
@@ -151,16 +172,6 @@ public class ContentsActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        // 사진 찍기 버튼 누른 경우
-        btn_takePicture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TakePictureIntent();
-            }
-        });
-
-
     }
 
     @SuppressLint({"HardwareIds", "MissingPermission"})
@@ -176,15 +187,14 @@ public class ContentsActivity extends AppCompatActivity {
 
             // 번호를 받아와 +82를 0으로 바꿔주기
             //TextUtils.isEmpty(string) : Returns true if the string is null or 0-length.
-            if(TextUtils.isEmpty(tm.getLine1Number())){
+            if (TextUtils.isEmpty(tm.getLine1Number())) {
                 userPhoneNumber = "번호를 불러오지 못함";
-            }else{
+            } else {
                 userPhoneNumber = (tm.getLine1Number()).replace("+82", "0");
             }
 
-
-            Log.i(Global.TAG, "userIMEI: "+userIMEI);
-            Log.i(Global.TAG, "userPhoneNumber: "+userPhoneNumber);
+            Log.i(Global.TAG, "userIMEI: " + userIMEI);
+            Log.i(Global.TAG, "userPhoneNumber: " + userPhoneNumber);
 
             textIMEI.setText(userIMEI);
             textPhoneNumber.setText(userPhoneNumber);
@@ -447,10 +457,99 @@ public class ContentsActivity extends AppCompatActivity {
         }
     }
 
-    public void TakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, Global.REQ_IMAGE_CAPTURE);
-        }
+    // 파일 첨부 버튼 눌렀을 때 AlertDialog 생성
+    private void makeDialog() {
+        final String[] items= {"앨범 선택", "사진 촬영", "동영상 촬영", "취소"};
+
+        AlertDialog.Builder alt_bld = new AlertDialog.Builder(ContentsActivity.this);
+        alt_bld.setTitle("파일 첨부") // 제목 설정
+                .setIcon(R.drawable.icon) // 아이콘 설정
+                .setCancelable(false) // 뒤로 버튼 클릭시 취소 가능 설정정
+               .setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // which는 선택한 item index 순서
+                        switch (which){
+                            case 0 :
+                                Log.v("알림", "다이얼로그 > 앨범선택 선택");
+                                // 앨범에서 선택
+                                performFileSearch();
+                                break;
+                            case 1 :
+                                Log.v("알림", "다이얼로그 > 사진촬영 선택");
+                                // 사진 촬영 클릭
+                                TakePictureIntent();
+                                break;
+                            case 2 :
+                                Log.v("알림", "다이얼로그 > 동영상 촬영 선택");
+                                // 동영상 촬영 클릭
+                                TakePictureIntent();
+                                break;
+                            case 3 :
+                                Log.v("알림", "다이얼로그 > 취소 선택");
+                                // 취소 클릭. dialog 닫기.
+                                dialog.cancel();
+                                break;
+                        }
+                    }
+                });
+
+        AlertDialog alert = alt_bld.create(); // 알림창 객체 생성
+        alert.show(); // 알림창 띄우기
     }
-}
+
+    // 사진 찍기
+    private void TakePictureIntent() {
+        Log.i(Global.TAG, "TakePictureIntent() invoked.");
+        // 촬영 후 이미지 가져옴
+        String state = Environment.getExternalStorageState();
+
+       // if (Environment.MEDIA_MOUNTED.equals(state)) {
+            // 사진을 찍는 인텐트 MediaStore에 있는 ACTION_IMAGE_CAPTURE를 활용해서 가져온다
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                /*File photoFile = null;
+                try {
+                    photoFile = createImageFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (photoFile != null) {
+                    Uri providerURI = FileProvider.getUriForFile(this.getPackageName(), photoFile);
+                    imgUri = providerURI;
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, providerURI);*/
+                //http://dailyddubby.blogspot.com/2018/04/107-tedpermission.html
+
+                    // 사진 찍기 인텐트 불러오기
+                    startActivityForResult(takePictureIntent, Global.REQ_IMAGE_CAPTURE);
+                }
+            }
+      /*  } else {
+            Log.i(Global.TAG, "저장공간에 접근 불가능");
+
+            return;
+        }*/
+    }
+/*
+    // source : 파일이름.확장자
+    // 안드로이드 기본 경로는 /storage/emulated/0/NuguCall
+    // 종합 경로 : /storage/emulated/0/NuguCall/"파일이름.확장자"
+    String filePath = Global.DEFAULT_PATH + File.separator + source;
+    // 파일 성질 알아내기 (image/png) (video/mp4)
+    String mimeType = URLConnection.guessContentTypeFromName(filePath);
+    // 슬래시 앞에 것 따오기
+    mimeType = mimeType.substring(0, mimeType.indexOf("/"));
+    File file = new File(filePath);
+*/
+
+   /*
+   // 사진 미리보기 화면 가져오기
+   @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == Global.REQ_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            mImageView.setImageBitmap(imageBitmap);
+        }
+    }*/
+//}
