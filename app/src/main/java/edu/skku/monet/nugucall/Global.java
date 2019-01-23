@@ -40,6 +40,6 @@ class Global {
     static final String INTENT_EXTRA_NAME = "INTENT_EXTRA_NAME";
     static final String INTENT_EXTRA_TEXT = "INTENT_EXTRA_TEXT";
     static final String INTENT_EXTRA_SOURCE = "INTENT_EXTRA_SOURCE";
-    static final String INTENT_EXTRA_SIZE = "INTENT_EXTRA_SIZE";
+    static final String INTENT_EXTRA_FILEPATH = "INTENT_EXTRA_FILEPATH";
 
 }

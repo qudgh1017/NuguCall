@@ -9,7 +9,7 @@ public class PreviewActivity extends AppCompatActivity {
     private String phone;
     private String text;
     private String source;
-    private String size;
+    private String filePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,11 +18,11 @@ public class PreviewActivity extends AppCompatActivity {
 
         //ContentsActivity로부터 넘어온 intent
         Intent contents_intent = getIntent();
-        name = contents_intent.getExtras().getString(Global.INTENT_EXTRA_NAME);
-        phone = contents_intent.getExtras().getString(Global.INTENT_EXTRA_PHONE_NUMBER);
-        text = contents_intent.getExtras().getString(Global.INTENT_EXTRA_TEXT);
-        source = contents_intent.getExtras().getString(Global.INTENT_EXTRA_SOURCE);
-        size = contents_intent.getExtras().getString(Global.INTENT_EXTRA_SIZE);
+        name = contents_intent.getStringExtra(Global.INTENT_EXTRA_NAME);
+        phone = contents_intent.getStringExtra(Global.INTENT_EXTRA_PHONE_NUMBER);
+        text = contents_intent.getStringExtra(Global.INTENT_EXTRA_TEXT);
+        source = contents_intent.getStringExtra(Global.INTENT_EXTRA_SOURCE);
+        filePath = contents_intent.getStringExtra(Global.INTENT_EXTRA_FILEPATH);
 
         //미리보기 화면 띄우기
         turnOnpreviewContents();
@@ -47,7 +47,7 @@ public class PreviewActivity extends AppCompatActivity {
         i.putExtra(Global.INTENT_EXTRA_PHONE_NUMBER, phone);
         i.putExtra(Global.INTENT_EXTRA_TEXT, text);
         i.putExtra(Global.INTENT_EXTRA_SOURCE, source);
-        i.putExtra(Global.INTENT_EXTRA_SIZE, size);
+        i.putExtra(Global.INTENT_EXTRA_FILEPATH, filePath);
         // BackgroundService로 인텐트 발신
         sendBroadcast(i);
     }

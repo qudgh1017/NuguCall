@@ -168,7 +168,7 @@ public class ContentsActivity extends AppCompatActivity {
                 intent.putExtra(Global.INTENT_EXTRA_PHONE_NUMBER, userPhoneNumber);
                 intent.putExtra(Global.INTENT_EXTRA_TEXT, userText);
                 intent.putExtra(Global.INTENT_EXTRA_SOURCE, userSource);
-                intent.putExtra(Global.INTENT_EXTRA_SIZE, userSize);
+                intent.putExtra(Global.INTENT_EXTRA_FILEPATH, filePath);
 
                 startActivity(intent);
 

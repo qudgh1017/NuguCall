@@ -66,13 +66,6 @@ public class BackgroundService extends Service {
     private String contentsSource;
     private String contentsSize;
 
-    //프리뷰 콜백을 위한 String
-    private String contentsNamePreview;
-    private String contentsPhonePreview;
-    private String contentsTextPreview;
-    private String contentsSourcePreview;
-    private String contentsSizePreview;
-
     // 서비스가 처음 시작될 때 실행
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -102,18 +95,6 @@ public class BackgroundService extends Service {
         }
     };
 
-    //프리뷰 파일 다운로드 콜백
-    private ThreadReceive downloadThreadReceivePreview = new ThreadReceive() {
-        @Override
-        public void onReceiveRun(String fileName, long fileSize) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    callScreenLayout.turnOnpreviewContents(contentsNamePreview, contentsPhonePreview, contentsTextPreview, contentsSourcePreview, contentsSizePreview);
-                }
-            });
-        }
-    };
 
     // 알림바 선언
     public void setNotification() {
@@ -303,39 +284,21 @@ public class BackgroundService extends Service {
         }
 
         //미리보기 화면 띄우기
-        public void turnOnpreviewContents(String name, String phone, String text, String source, String size) {
+        public void turnOnpreviewContents(String name, String phone, String text, String source, String filePath) {
             Log.i(Global.TAG, "turnOnpreviewContents() invoked.");
 
-            // source : 파일이름.확장자
-            // 안드로이드 기본 경로는 /storage/emulated/0/NuguCall
-            // 종합 경로 : /storage/emulated/0/NuguCall/"파일이름.확장자"
-            String filePath = Global.DEFAULT_PATH + File.separator + source;
-            File file = new File(filePath);
-
-            // 해당 파일이 존재하지 않는 경우 다운로드 실행
-            if (!file.exists()) {
-                //콜백의 arguments로 사용됨
-                contentsNamePreview = name;
-                contentsPhonePreview = phone;
-                contentsTextPreview = text;
-                contentsSourcePreview = source;
-                contentsSizePreview = size;
-
-                //파일 다운로드 후 콜백을 통해서 turnOnpreviewContents를 다시 한번 부르게됨
-                ContentsFileDownload contentsFileDownloadPreview = new ContentsFileDownload(downloadThreadReceivePreview, filePath, size);
-                contentsFileDownloadPreview.fileDownload();
+            //미리보기가 이미 켜져있을 경우 실행안함
+            if (isShowingPreview) {
                 return;
             }
+            isShowingPreview = true;
+
+            File file = new File(filePath);
 
             // 파일 성질 알아내기 (image/png) (video/mp4)
             String mimeType = URLConnection.guessContentTypeFromName(filePath);
             // 슬래시 앞에 것 따오기
             mimeType = mimeType.substring(0, mimeType.indexOf("/"));
-
-            if (isShowingPreview) {
-                return;
-            }
-            isShowingPreview = true;
 
             tv_name.setText(name);
             tv_phone.setText(PhoneNumberUtils.formatNumber(phone));
@@ -592,8 +555,8 @@ public class BackgroundService extends Service {
                         String i_phone = intent.getStringExtra(Global.INTENT_EXTRA_PHONE_NUMBER);
                         String i_text = intent.getStringExtra(Global.INTENT_EXTRA_TEXT);
                         String i_source = intent.getStringExtra(Global.INTENT_EXTRA_SOURCE);
-                        String i_size = intent.getStringExtra(Global.INTENT_EXTRA_SOURCE);
-                        callScreenLayout.turnOnpreviewContents(i_name, i_phone, i_text, i_source, i_size);
+                        String i_filePath = intent.getStringExtra(Global.INTENT_EXTRA_FILEPATH);
+                        callScreenLayout.turnOnpreviewContents(i_name, i_phone, i_text, i_source, i_filePath);
                         break;
                     case Global.INTENT_ACTION_PREVIEW_CONTENTS_OFF:
                         callScreenLayout.turnOffpreviewContents();
