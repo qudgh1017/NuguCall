@@ -19,6 +19,7 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -492,7 +493,12 @@ public class BackgroundService extends Service {
             }
 
             // 번호를 받아와 +82를 0으로 바꿔주기
-            userPhoneNumber = (tm.getLine1Number()).replace("+82", "0");
+            //TextUtils.isEmpty(string) : Returns true if the string is null or 0-length.
+            if(TextUtils.isEmpty(tm.getLine1Number())){
+                userPhoneNumber = "번호를 불러오지 못함";
+            }else{
+                userPhoneNumber = (tm.getLine1Number()).replace("+82", "0");
+            }
 
         } catch (Exception e) { // 권한 오류로 인한 경우 catch
             e.printStackTrace();
