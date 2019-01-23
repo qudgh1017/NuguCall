@@ -37,7 +37,7 @@ public class ContentsActivity extends AppCompatActivity {
     // 서버에 보낼 값, 폰 정보 불러온 값을 보여줄 TextView
     EditText textName, textText;
     TextView textPhoneNumber, textIMEI, textSource;
-    Button btn_send, btn_reset, btn_delete, btn_fileUpload, btn_PreviewActivity;
+    Button btn_send, btn_reset, btn_delete, btn_fileUpload, btn_PreviewActivity, btn_takePicture;
 
     // btn_send가 등록인지 수정인지 알기위해 (등록:0, 수정:1)
     int btn_check = 0;
@@ -79,6 +79,7 @@ public class ContentsActivity extends AppCompatActivity {
         btn_delete = findViewById(R.id.btn_delete);
         btn_fileUpload = findViewById(R.id.btn_fileUpload);
         btn_PreviewActivity = findViewById(R.id.btn_PreviewActivity);
+        btn_takePicture = findViewById(R.id.btn_takePicture);
 
         // 폰 정보 불러오기 (userIMEI, userPhoneNumber)
         getUserPhoneInformation();
@@ -142,14 +143,24 @@ public class ContentsActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), PreviewActivity.class);
 
                 // 미리보기 화면을 띄우기 위해 필요한 정보 전달
-                intent.putExtra("name", textName.getText());
-                intent.putExtra("phone", textPhoneNumber.getText());
-                intent.putExtra("text", textText.getText());
-                intent.putExtra("source", textSource.getText());
+                //intent.putExtra(Global.INTENT_EXTRA_NAME, textName.getText());
+                //intent.putExtra(Global.INTENT_EXTRA_PHONE_NUMBER, textPhoneNumber.getText());
+                //intent.putExtra(Global.INTENT_EXTRA_TEXT, textText.getText());
+                //intent.putExtra(Global.INTENT_EXTRA_SOURCE, textSource.getText());
 
                 startActivity(intent);
             }
         });
+
+        // 사진 찍기 버튼 누른 경우
+        btn_takePicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TakePictureIntent();
+            }
+        });
+
+
     }
 
     @SuppressLint({"HardwareIds", "MissingPermission"})
@@ -436,7 +447,7 @@ public class ContentsActivity extends AppCompatActivity {
         }
     }
 
-    public void dispatchTakePictureIntent() {
+    public void TakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, Global.REQ_IMAGE_CAPTURE);

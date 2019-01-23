@@ -57,9 +57,18 @@ public class SplashActivity extends AppCompatActivity {
     public void checkStoragePermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(SplashActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            checkOverlayPermission();
+            checkCameraPermission();
         } else {
             ActivityCompat.requestPermissions(SplashActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, Global.REQ_CODE_PERMISSION_STORAGE);
+        }
+    }
+
+    public void checkCameraPermission() {
+        int permissionCheck = ContextCompat.checkSelfPermission(SplashActivity.this, Manifest.permission.CAMERA);
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            checkOverlayPermission();
+        } else {
+            ActivityCompat.requestPermissions(SplashActivity.this, new String[]{Manifest.permission.CAMERA}, Global.REQ_CODE_PERMISSION_CAMERA);
         }
     }
 
@@ -140,6 +149,12 @@ public class SplashActivity extends AppCompatActivity {
                 finish();
             }
         } else if (requestCode == Global.REQ_CODE_PERMISSION_STORAGE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                checkCameraPermission();
+            } else {
+                finish();
+            }
+        }else if (requestCode == Global.REQ_CODE_PERMISSION_CAMERA) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 checkOverlayPermission();
             } else {
