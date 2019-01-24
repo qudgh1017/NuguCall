@@ -421,10 +421,11 @@ public class ContentsActivity extends AppCompatActivity {
         intent.setType("image/*");
         intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*"});
 
+        // 결과처리 하기 위해 onActivityResult()함수 무조건 호출
         startActivityForResult(intent, Global.REQ_CODE_FILE_SELECT);
     }
 
-    // 문서 제공자 검색을 위한 함수2 (결과처리)
+    // 문서 제공자 검색을 위한 함수2 & 사진 찍기를 위한 함수(결과처리)
     // 사용자가 선택기에서 문서를 선택하면 onActivityResult()가 호출됩니다. 선택한 문서를 가리키는 URI는 resultData 매개변수 안에 들어 있습니다.
     // 이 URI를 getData()를 사용하여 추출합니다. 일단 이것을 가지게 되면 이를 사용하여 사용자가 원하는 문서를 검색하면 됩니다
     @Override
@@ -456,38 +457,48 @@ public class ContentsActivity extends AppCompatActivity {
                     }
                 }
             }
+        } else if(requestCode == Global.REQ_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK){
+            // 카메라 촬영 결과처리 : 찍은 사진을 갤러리에 저장하기
+            try{
+                Log.i(Global.TAG, "startActivityForResult(takePictureIntent, Global.REQ_IMAGE_CAPTURE) 결과처리");
+                galleryAddPic(); // 찍은 사진을 갤러리에 저장하기
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        } else{
+            return;
         }
     }
 
     // 파일 첨부 버튼 눌렀을 때 AlertDialog 생성
-    private void makeDialog() {
-        final String[] items= {"앨범 선택", "사진 촬영", "동영상 촬영", "취소"};
+    public void makeDialog() {
+        final String[] items = {"앨범 선택", "사진 촬영", "동영상 촬영", "취소"};
 
         AlertDialog.Builder alt_bld = new AlertDialog.Builder(ContentsActivity.this);
         alt_bld.setTitle("파일 첨부") // 제목 설정
                 .setIcon(R.drawable.icon) // 아이콘 설정
                 .setCancelable(false) // 뒤로 버튼 클릭시 취소 가능 설정정
-               .setItems(items, new DialogInterface.OnClickListener() {
+                .setItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // which는 선택한 item index 순서
-                        switch (which){
-                            case 0 :
+                        switch (which) {
+                            case 0:
                                 Log.v("알림", "다이얼로그 > 앨범선택 선택");
                                 // 앨범에서 선택
                                 performFileSearch();
                                 break;
-                            case 1 :
+                            case 1:
                                 Log.v("알림", "다이얼로그 > 사진촬영 선택");
                                 // 사진 촬영 클릭
-                                TakePictureIntent();
+                                takePictureIntent();
                                 break;
-                            case 2 :
+                            case 2:
                                 Log.v("알림", "다이얼로그 > 동영상 촬영 선택");
                                 // 동영상 촬영 클릭
-                                TakePictureIntent();
+                                takePictureIntent();
                                 break;
-                            case 3 :
+                            case 3:
                                 Log.v("알림", "다이얼로그 > 취소 선택");
                                 // 취소 클릭. dialog 닫기.
                                 dialog.cancel();
@@ -501,37 +512,73 @@ public class ContentsActivity extends AppCompatActivity {
     }
 
     // 사진 찍기
-    private void TakePictureIntent() {
+    public void takePictureIntent() {
         Log.i(Global.TAG, "TakePictureIntent() invoked.");
         // 촬영 후 이미지 가져옴
         String state = Environment.getExternalStorageState();
 
-       // if (Environment.MEDIA_MOUNTED.equals(state)) {
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
             // 사진을 찍는 인텐트 MediaStore에 있는 ACTION_IMAGE_CAPTURE를 활용해서 가져온다
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                /*File photoFile = null;
+                File photoFile = null;
                 try {
                     photoFile = createImageFile();
+                    Log.i(Global.TAG, "photoFile: " + photoFile);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 if (photoFile != null) {
-                    Uri providerURI = FileProvider.getUriForFile(this.getPackageName(), photoFile);
+                    Uri providerURI = FileProvider.getUriForFile(this, getPackageName(), photoFile);
                     imgUri = providerURI;
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, providerURI);*/
-                //http://dailyddubby.blogspot.com/2018/04/107-tedpermission.html
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, providerURI);
+                    Log.i(Global.TAG, "ContentsActivity - takePictureIntent() - getPackageName(): " + getPackageName());
+                    Log.i(Global.TAG, "ContentsActivity - takePictureIntent() - providerURI: " + providerURI);
 
                     // 사진 찍기 인텐트 불러오기
+                    // 결과처리 하기 위해 onActivityResult()함수 무조건 호출
                     startActivityForResult(takePictureIntent, Global.REQ_IMAGE_CAPTURE);
                 }
             }
-      /*  } else {
+        } else {
             Log.i(Global.TAG, "저장공간에 접근 불가능");
 
             return;
-        }*/
+        }
     }
+
+    // 카메라로 촬영한 이미지 생성하기
+    public File createImageFile() throws IOException{
+        Log.i(Global.TAG, "CreateImageFile() invoked.");
+        String imgFileName = System.currentTimeMillis() + ".jpg";
+        File imageFile = null;
+        File storageDir = new File(Global.DEFAULT_PATH + File.separator + "Pictures", "ireh");
+
+        if(!storageDir.exists()){
+            // 없으면 만들기
+            Log.i(Global.TAG, "ContentsActivity - CreateIamgeFile() - storageDir 존재x");
+            storageDir.mkdir(); // 파일객체가 참조하는 경로로 디렉토리 생성
+        }
+        Log.i(Global.TAG, "ContentsActivity - CreateIamgeFile() - storageDir 존재");
+        // new File(디렉토리 경로, "파일명")
+        imageFile = new File(storageDir, imgFileName);
+        // getAbsolutePath(): 파일 객체의 절대 경로를 리턴
+        mCurrentPhotoPath = imageFile.getAbsolutePath();
+
+        return imageFile;
+    }
+
+    // 찍은 사진을 갤러리에 저장하기
+    public void galleryAddPic(){
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File file = new File(mCurrentPhotoPath);
+        Uri contentUri = Uri.fromFile(file);
+        mediaScanIntent.setData(contentUri);
+        sendBroadcast(mediaScanIntent);
+        Toast.makeText(this,"사진이 저장되었습니다",Toast.LENGTH_SHORT).show();
+    }
+
+
 /*
     // source : 파일이름.확장자
     // 안드로이드 기본 경로는 /storage/emulated/0/NuguCall
@@ -543,15 +590,4 @@ public class ContentsActivity extends AppCompatActivity {
     mimeType = mimeType.substring(0, mimeType.indexOf("/"));
     File file = new File(filePath);
 */
-
-   /*
-   // 사진 미리보기 화면 가져오기
-   @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == Global.REQ_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            mImageView.setImageBitmap(imageBitmap);
-        }
-    }*/
-//}
+}
