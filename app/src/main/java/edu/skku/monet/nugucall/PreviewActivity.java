@@ -1,8 +1,12 @@
 package edu.skku.monet.nugucall;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
         import android.os.Bundle;
+import android.util.Log;
 
 public class PreviewActivity extends AppCompatActivity {
     private String name;
@@ -23,6 +27,9 @@ public class PreviewActivity extends AppCompatActivity {
         text = contents_intent.getStringExtra(Global.INTENT_EXTRA_TEXT);
         source = contents_intent.getStringExtra(Global.INTENT_EXTRA_SOURCE);
         filePath = contents_intent.getStringExtra(Global.INTENT_EXTRA_FILEPATH);
+
+        //브로드캐스트 리시버 등록
+        setBroadcastReceiver_preview();
 
         //미리보기 화면 띄우기
         turnOnpreviewContents();
@@ -57,4 +64,27 @@ public class PreviewActivity extends AppCompatActivity {
         Intent i = new Intent(Global.INTENT_ACTION_PREVIEW_CONTENTS_OFF);
         sendBroadcast(i);
     }
+
+    public void setBroadcastReceiver_preview(){
+        Log.i(Global.TAG, "setBroadcastReceiver_preview() invoked.");
+        //인텐트 필터 선언 & 액션 추가
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Global.INTENT_ACTION_PREVIEW_ACTIVITY_OFF);
+        //브로드캐스트리시버&인텐트필터 등록
+        registerReceiver(broadcastReceiver_preview, intentFilter);
+    }
+
+    public BroadcastReceiver broadcastReceiver_preview = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action != null){
+                switch (action){
+                    case Global.INTENT_ACTION_PREVIEW_ACTIVITY_OFF:
+                        finish();
+                        break;
+                }
+            }
+        }
+    };
 }

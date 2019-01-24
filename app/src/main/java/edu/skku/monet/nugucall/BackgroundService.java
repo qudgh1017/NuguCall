@@ -22,6 +22,7 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -186,6 +187,22 @@ public class BackgroundService extends Service {
 
             // 지나가는 애니메이션을 위해 필요
             tv_text.setSelected(true);
+        }
+
+        @Override
+        public boolean dispatchKeyEvent(KeyEvent event) {
+            //뒤로가기 버튼이 눌렸을때
+            if(event.getKeyCode() == KeyEvent.KEYCODE_BACK){
+                //미리보기 화면 종료
+                turnOffpreviewContents();
+
+                //PreviewActivity로 브로드캐스트를 보내어 액티비티 종료
+                Intent preview_intent = new Intent(Global.INTENT_ACTION_PREVIEW_ACTIVITY_OFF);
+                sendBroadcast(preview_intent);
+
+                return super.dispatchKeyEvent(event);
+            }
+            return super.dispatchKeyEvent(event);
         }
 
         // 컨텐츠 보여주기
