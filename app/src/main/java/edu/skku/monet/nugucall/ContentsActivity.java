@@ -56,6 +56,7 @@ public class ContentsActivity extends AppCompatActivity {
     // 사진 찍기 기능
     private Uri imgUri, photoURI, albumURI;
     private String mCurrentPhotoPath;
+    private String imgFileName;
 
     // btn_send가 등록인지 수정인지 알기위해 (등록:0, 수정:1)
     int btn_check = 0;
@@ -114,6 +115,7 @@ public class ContentsActivity extends AppCompatActivity {
                     userName = textName.getText().toString();
                     userText = textText.getText().toString();
                     userSource = textSource.getText().toString();
+                    Log.i(Global.TAG, "수정 버튼 누를 때 보내는 값: userSource: " + userSource);
 
                     // contents 업로드할 때 쓰는 contentsFileUpload 클래스 생성
                     // 생성자에 threadReceive 인터페이스를 변수로 보냄
@@ -250,7 +252,7 @@ public class ContentsActivity extends AppCompatActivity {
                                         textName.setText(name);
                                         textText.setText(text);
                                         textSource.setText(source);
-                                        filePath = sharedPreferences.getString("filepath","");
+                                        filePath = sharedPreferences.getString("filepath", "");
                                     } else {
                                         // 새로 컨텐츠를 등록할 수 있게 띄우고, 등록 버튼으로 변경하고 삭제, 미리보기 버튼은 안보이게
                                         btn_check = 0;
@@ -441,7 +443,6 @@ public class ContentsActivity extends AppCompatActivity {
         // The ACTION_OPEN_DOCUMENT intent was sent with the request code
         // READ_REQUEST_CODE. If the request code seen here doesn't match, it's the
         // response to some other intent, and the code below shouldn't run at all.
-
         if (requestCode == Global.REQ_CODE_FILE_SELECT && resultCode == Activity.RESULT_OK) {
             // The document selected by the user won't be returned in the intent.
             // Instead, a URI to that document will be contained in the return intent
@@ -469,15 +470,26 @@ public class ContentsActivity extends AppCompatActivity {
                     }
                 }
             }
-        } else if(requestCode == Global.REQ_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK){
+        } else if (requestCode == Global.REQ_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             // 카메라 촬영 결과처리 : 찍은 사진을 갤러리에 저장하기
-            try{
+            try {
                 Log.i(Global.TAG, "startActivityForResult(takePictureIntent, Global.REQ_IMAGE_CAPTURE) 결과처리");
-                galleryAddPic(); // 찍은 사진을 갤러리에 저장하기
-            }catch (Exception e){
+                galleryAddPic(); // 찍은 사진의 경로를 가져와서 갤러리에 보여주게만 하는거(찍은 사진을 스캔)
+
+                filePath = mCurrentPhotoPath;
+                Log.i(Global.TAG, "filePath: " + filePath);
+
+                if (filePath != null) {
+                    // filePath(/storage/emulated/0/Movies/)를 변경해서 파일명.확장자 고객화면에 보여주기
+                    String[] splitFilePath = filePath.split("/");
+                    userSource = splitFilePath[splitFilePath.length - 1];
+                    Log.i(Global.TAG, "userSource: " + userSource);
+                    textSource.setText(userSource);
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else{
+        } else {
             return;
         }
     }
@@ -523,29 +535,32 @@ public class ContentsActivity extends AppCompatActivity {
         alert.show(); // 알림창 띄우기
     }
 
-    // 사진 찍기
+    // 사진 찍고 저장하는 인텐트 호출
     public void takePictureIntent() {
         Log.i(Global.TAG, "TakePictureIntent() invoked.");
         // 촬영 후 이미지 가져옴
         String state = Environment.getExternalStorageState();
 
+        Log.i(Global.TAG, "ContentsActivity - takePictureIntent() - state: " + state);
         if (Environment.MEDIA_MOUNTED.equals(state)) {
             // 사진을 찍는 인텐트 MediaStore에 있는 ACTION_IMAGE_CAPTURE를 활용해서 가져온다
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                 File photoFile = null;
                 try {
+                    // 파일을 받아옴 (/storage/emulated/0/NuguCall/Pictures/파일명.jpg)
                     photoFile = createImageFile();
                     Log.i(Global.TAG, "photoFile: " + photoFile);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 if (photoFile != null) {
-                    Uri providerURI = FileProvider.getUriForFile(this, getPackageName(), photoFile);
+                    Log.i(Global.TAG, "ContentsActivity - takePictureIntent() - getPackageName(): " + getPackageName());
+                    // getUriForFile의 두번째 매개변수는 FileProvider의 authorities와 같아야한다.
+                    Uri providerURI = FileProvider.getUriForFile(ContentsActivity.this, getPackageName(), photoFile);
+                    Log.i(Global.TAG, "ContentsActivity - takePictureIntent() - providerURI: " + providerURI);
                     imgUri = providerURI;
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, providerURI);
-                    Log.i(Global.TAG, "ContentsActivity - takePictureIntent() - getPackageName(): " + getPackageName());
-                    Log.i(Global.TAG, "ContentsActivity - takePictureIntent() - providerURI: " + providerURI);
 
                     // 사진 찍기 인텐트 불러오기
                     // 결과처리 하기 위해 onActivityResult()함수 무조건 호출
@@ -559,14 +574,20 @@ public class ContentsActivity extends AppCompatActivity {
         }
     }
 
-    // 카메라로 촬영한 이미지 생성하기
-    public File createImageFile() throws IOException{
+    // 카메라로 촬영한 이미지 경로 설정해주기
+    public File createImageFile() throws IOException {
         Log.i(Global.TAG, "CreateImageFile() invoked.");
-        String imgFileName = System.currentTimeMillis() + ".jpg";
+        //String imgFileName = System.currentTimeMillis() + ".jpg";
+        imgFileName = System.currentTimeMillis() + ".jpg";
         File imageFile = null;
-        File storageDir = new File(Global.DEFAULT_PATH + File.separator + "Pictures", "ireh");
+        // File storageDir = new File(Global.DEFAULT_PATH + File.separator + "Pictures");
+        // storageDir: /storage/emulated/0/NuguCall/Pictures
+        // photoFile의 경로는 Manifest의 FileProvider에서 정의한 meta-data의 FILE_PROVIDER_PATHS의 경로와 같아야한다.
+        File storageDir = new File(Global.DEFAULT_PATH + File.separator + "Pictures");
+        Log.i(Global.TAG, "imgFileName: " + imgFileName);
+        Log.i(Global.TAG, "storageDir: " + storageDir);
 
-        if(!storageDir.exists()){
+        if (!storageDir.exists()) {
             // 없으면 만들기
             Log.i(Global.TAG, "ContentsActivity - CreateIamgeFile() - storageDir 존재x");
             storageDir.mkdir(); // 파일객체가 참조하는 경로로 디렉토리 생성
@@ -577,18 +598,29 @@ public class ContentsActivity extends AppCompatActivity {
         // getAbsolutePath(): 파일 객체의 절대 경로를 리턴
         mCurrentPhotoPath = imageFile.getAbsolutePath();
 
+        Log.i(Global.TAG, "imageFile: " + imageFile);
+        Log.i(Global.TAG, "mCurrentPhotoPath: " + mCurrentPhotoPath);
+
         return imageFile;
     }
 
-    // 찍은 사진을 갤러리에 저장하기
-    public void galleryAddPic(){
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+    // 찍은 사진을 갤러리에 보여지게 하기(스캔)
+    public void galleryAddPic() {
+        Log.i(Global.TAG, "galleryAddPic() invoked.");
+
+        // 해당 경로에 있는 파일을 객체화화
         File file = new File(mCurrentPhotoPath);
-        Uri contentUri = Uri.fromFile(file);
-        mediaScanIntent.setData(contentUri);
+        Log.i(Global.TAG, "file: " + file);
+        //Uri contentUri = Uri.fromFile(file);
+        Uri contentUri = Uri.parse("file://" + file.getPath());
+        Log.i(Global.TAG, "contentUri: " + contentUri);
+
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, contentUri);
         sendBroadcast(mediaScanIntent);
-        Toast.makeText(this,"사진이 저장되었습니다",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "사진이 저장되었습니다", Toast.LENGTH_SHORT).show();
     }
+
+
 
 
 /*
