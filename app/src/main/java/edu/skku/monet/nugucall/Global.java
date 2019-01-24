@@ -15,6 +15,7 @@ class Global {
     static final String SHARED_PREFERENCES_WIDTH = "width";
     static final String SHARED_PREFERENCES_HEIGHT = "height";
     static final String SHARED_PREFERENCES_INCOMING = "incoming";
+    static final String SHARED_PREFERENCES_FILEPATH = "filepath";
 
     static final int NOTIFICATION_ID = 1;
     static final String NOTIFICATION_CHANNEL_ID = "NUGUCALL";

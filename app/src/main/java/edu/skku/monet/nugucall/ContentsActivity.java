@@ -12,6 +12,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -49,6 +50,9 @@ public class ContentsActivity extends AppCompatActivity {
     TextView textPhoneNumber, textIMEI, textSource;
     Button btn_send, btn_reset, btn_delete, btn_fileUpload, btn_PreviewActivity;
 
+    // 간단한 데이터 저장 및 불러오기에 사용
+    private SharedPreferences sharedPreferences;
+
     // 사진 찍기 기능
     private Uri imgUri, photoURI, albumURI;
     private String mCurrentPhotoPath;
@@ -82,6 +86,8 @@ public class ContentsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_contents);
 
         handler = new Handler(getMainLooper());
+
+        sharedPreferences = getSharedPreferences(Global.SHARED_PREFERENCES_FILEPATH, MODE_PRIVATE);
 
         textName = findViewById(R.id.textName);
         textText = findViewById(R.id.textText);
@@ -164,10 +170,10 @@ public class ContentsActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), PreviewActivity.class);
 
                 // 미리보기 화면을 띄우기 위해 필요한 정보 전달
-                intent.putExtra(Global.INTENT_EXTRA_NAME, userName);
-                intent.putExtra(Global.INTENT_EXTRA_PHONE_NUMBER, userPhoneNumber);
-                intent.putExtra(Global.INTENT_EXTRA_TEXT, userText);
-                intent.putExtra(Global.INTENT_EXTRA_SOURCE, userSource);
+                intent.putExtra(Global.INTENT_EXTRA_NAME, textName.getText().toString());
+                intent.putExtra(Global.INTENT_EXTRA_PHONE_NUMBER, textPhoneNumber.getText().toString());
+                intent.putExtra(Global.INTENT_EXTRA_TEXT, textText.getText().toString());
+                intent.putExtra(Global.INTENT_EXTRA_SOURCE, textSource.getText().toString());
                 intent.putExtra(Global.INTENT_EXTRA_FILEPATH, filePath);
 
                 startActivity(intent);
@@ -244,6 +250,7 @@ public class ContentsActivity extends AppCompatActivity {
                                         textName.setText(name);
                                         textText.setText(text);
                                         textSource.setText(source);
+                                        filePath = sharedPreferences.getString("filepath","");
                                     } else {
                                         // 새로 컨텐츠를 등록할 수 있게 띄우고, 등록 버튼으로 변경하고 삭제, 미리보기 버튼은 안보이게
                                         btn_check = 0;
@@ -448,6 +455,11 @@ public class ContentsActivity extends AppCompatActivity {
 
                     // filePath
                     filePath = ContentsFilePath.getPath(getApplicationContext(), uri);
+
+                    //앱 재시작시에도 미리보기 지원을 위해 Sharepreference에 저장
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("filepath", filePath);
+                    editor.apply();
 
                     if (filePath != null) {
                         // filePath(/storage/emulated/0/Movies/)를 변경해서 파일명.확장자 고객화면에 보여주기
