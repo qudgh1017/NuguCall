@@ -35,7 +35,7 @@ public class PreviewActivity extends FragmentActivity {
         //여백없이 꽉채움
         imageView.setAdjustViewBounds(true);
         //이미지뷰에 이미지 업데이트
-        Glide.with(getApplicationContext()).load(R.drawable.smallscreen).into(imageView);
+        Glide.with(getApplicationContext()).load(R.drawable.fullscreen).into(imageView);
 
         //ContentsActivity로부터 넘어온 intent
         Intent contents_intent = getIntent();
