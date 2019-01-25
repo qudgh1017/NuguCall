@@ -4,11 +4,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
         import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageView;
 
-public class PreviewActivity extends AppCompatActivity {
+import com.bumptech.glide.Glide;
+
+public class PreviewActivity extends FragmentActivity {
     private String name;
     private String phone;
     private String text;
@@ -18,7 +24,18 @@ public class PreviewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //타이틀바 없애기
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //상태바 없애기
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_preview);
+
+
+        ImageView imageView = findViewById(R.id.imageView);
+        //여백없이 꽉채움
+        imageView.setAdjustViewBounds(true);
+        //이미지뷰에 이미지 업데이트
+        Glide.with(getApplicationContext()).load(R.drawable.smallscreen).into(imageView);
 
         //ContentsActivity로부터 넘어온 intent
         Intent contents_intent = getIntent();

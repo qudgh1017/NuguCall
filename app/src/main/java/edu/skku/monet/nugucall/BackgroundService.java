@@ -157,7 +157,7 @@ public class BackgroundService extends Service {
         // 중앙 정렬
         callScreenLayoutParams.gravity = Gravity.CENTER;
         // verticalMargin을 써서 아래로 내릴 수 있음
-        // callScreenLayoutParams.verticalMargin = 0;
+        callScreenLayoutParams.verticalMargin = (float)0.04;
         // 투명한 상태로 나왔다가 투명하게 사라지는 효과
         callScreenLayoutParams.windowAnimations = android.R.style.Animation_Toast;
     }

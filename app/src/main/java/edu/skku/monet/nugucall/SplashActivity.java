@@ -99,8 +99,8 @@ public class SplashActivity extends AppCompatActivity {
         display.getRealSize(point);
         int full_width = point.x; // 가로 해상도
         int full_height = point.y - status_bar_height; // 세로 해상도 - 알림바 높이
-        sharedPreferences.edit().putInt(Global.SHARED_PREFERENCES_WIDTH, full_width * 7 / 10).apply(); // 가로 해상도의 7/10
-        sharedPreferences.edit().putInt(Global.SHARED_PREFERENCES_HEIGHT, full_height * 4 / 10).apply(); // 세로 해상도의 4/10
+        sharedPreferences.edit().putInt(Global.SHARED_PREFERENCES_WIDTH, full_width * 9 / 10).apply(); // 가로 해상도의 7/10
+        sharedPreferences.edit().putInt(Global.SHARED_PREFERENCES_HEIGHT, full_height * 5 / 10).apply(); // 세로 해상도의 4/10
 
         // 발신/수신시 다운로드 받은 컨텐츠를 저장할 누구콜 전용 폴더를 생성하기
         File file = new File(Global.DEFAULT_PATH);
