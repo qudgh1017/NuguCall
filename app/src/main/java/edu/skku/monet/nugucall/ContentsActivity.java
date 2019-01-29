@@ -588,7 +588,7 @@ public class ContentsActivity extends AppCompatActivity {
                     takeContentsIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
                     break;
             }
-            
+
             if (takeContentsIntent.resolveActivity(getPackageManager()) != null) {
                 File photoFile = null;
                 try {
@@ -682,10 +682,7 @@ public class ContentsActivity extends AppCompatActivity {
         Toast.makeText(this, "컨텐츠가 저장되었습니다", Toast.LENGTH_SHORT).show();
     }
 
-
-
-
-
+    
 /*
     // source : 파일이름.확장자
     // 안드로이드 기본 경로는 /storage/emulated/0/NuguCall
