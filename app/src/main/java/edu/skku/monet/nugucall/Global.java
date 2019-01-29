@@ -28,6 +28,7 @@ class Global {
     static final int REQ_CODE_FILE_SELECT = 2001;
     static final int REQ_CODE_NOTIFICATION_INTENT = 3001;
     static final int REQ_IMAGE_CAPTURE = 4001;
+    static final int REQ_VIDEO_CAPTURE = 4002;
 
     static final String DEFAULT_PATH = Environment.getExternalStorageDirectory().getPath() + File.separator + "NuguCall";
 
