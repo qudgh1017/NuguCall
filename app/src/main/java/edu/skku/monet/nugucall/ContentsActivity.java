@@ -588,8 +588,7 @@ public class ContentsActivity extends AppCompatActivity {
                     takeContentsIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
                     break;
             }
-
-
+            
             if (takeContentsIntent.resolveActivity(getPackageManager()) != null) {
                 File photoFile = null;
                 try {
@@ -628,84 +627,6 @@ public class ContentsActivity extends AppCompatActivity {
             return;
         }
     }
-
-    /*// 사진 찍고 저장하는 인텐트 호출
-    public void takePictureIntent() {
-        Log.i(Global.TAG, "TakePictureIntent() invoked.");
-        // 촬영 후 이미지 가져옴
-        String state = Environment.getExternalStorageState();
-
-        Log.i(Global.TAG, "ContentsActivity - takePictureIntent() - state: " + state);
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            // 사진을 찍는 인텐트 MediaStore에 있는 ACTION_IMAGE_CAPTURE를 활용해서 가져온다
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                File photoFile = null;
-                try {
-                    // 파일을 받아옴 (/storage/emulated/0/NuguCall/Pictures/파일명.jpg)
-                    photoFile = createImageFile();
-                    Log.i(Global.TAG, "photoFile: " + photoFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if (photoFile != null) {
-                    Log.i(Global.TAG, "ContentsActivity - takePictureIntent() - getPackageName(): " + getPackageName());
-                    // getUriForFile의 두번째 매개변수는 FileProvider의 authorities와 같아야한다.
-                    Uri providerURI = FileProvider.getUriForFile(ContentsActivity.this, getPackageName(), photoFile);
-                    Log.i(Global.TAG, "ContentsActivity - takePictureIntent() - providerURI: " + providerURI);
-                    imgUri = providerURI;
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, providerURI);
-
-                    // 사진 찍기 인텐트 불러오기
-                    // 결과처리 하기 위해 onActivityResult()함수 무조건 호출
-                    startActivityForResult(takePictureIntent, Global.REQ_IMAGE_CAPTURE);
-                }
-            }
-        } else {
-            Log.i(Global.TAG, "저장공간에 접근 불가능");
-
-            return;
-        }
-    }
-
-    // 동영상 찍고 저장하는 인텐트 호출
-    public void takeVideoIntent() {
-        Log.i(Global.TAG, "takeVideoIntent() invoked.");
-        // 촬영 후 이미지 가져옴
-        String state = Environment.getExternalStorageState();
-
-        Log.i(Global.TAG, "ContentsActivity - takeVideoIntent() - state: " + state);
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            // 사진을 찍는 인텐트 MediaStore에 있는 ACTION_IMAGE_CAPTURE를 활용해서 가져온다
-            Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-            if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
-                File photoFile = null;
-                try {
-                    // 파일을 받아옴 (/storage/emulated/0/NuguCall/Pictures/파일명.jpg)
-                    photoFile = createImageFile();
-                    Log.i(Global.TAG, "photoFile: " + photoFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if (photoFile != null) {
-                    Log.i(Global.TAG, "ContentsActivity - takeVideoIntent() - getPackageName(): " + getPackageName());
-                    // getUriForFile의 두번째 매개변수는 FileProvider의 authorities와 같아야한다.
-                    Uri providerURI = FileProvider.getUriForFile(ContentsActivity.this, getPackageName(), photoFile);
-                    Log.i(Global.TAG, "ContentsActivity - takeVideoIntent() - providerURI: " + providerURI);
-                    imgUri = providerURI;
-                    takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, providerURI);
-
-                    // 사진 찍기 인텐트 불러오기
-                    // 결과처리 하기 위해 onActivityResult()함수 무조건 호출
-                    startActivityForResult(takeVideoIntent, Global.REQ_VIDEO_CAPTURE);
-                }
-            }
-        } else {
-            Log.i(Global.TAG, "저장공간에 접근 불가능");
-
-            return;
-        }
-    }*/
 
     // 카메라로 촬영한 이미지, 동영상 경로 설정해주기
     public File createImageFile(int req) throws IOException {
