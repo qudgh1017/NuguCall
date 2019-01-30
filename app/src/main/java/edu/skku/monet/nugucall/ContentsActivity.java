@@ -482,30 +482,11 @@ public class ContentsActivity extends AppCompatActivity {
                     }
                 }
             }
-        } else if (requestCode == Global.REQ_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            // 카메라 촬영 결과처리 : 찍은 사진을 갤러리에 저장하기
+        } else if ((requestCode == Global.REQ_IMAGE_CAPTURE || requestCode == Global.REQ_VIDEO_CAPTURE) && resultCode == Activity.RESULT_OK) {
+            // 카메라 촬영 결과처리 : 찍은 사진, 동영상을 갤러리에 저장하기
             try {
                 Log.i(Global.TAG, "startActivityForResult(takeContentsIntent, Global.REQ_IMAGE_CAPTURE) 결과처리");
-                galleryAddContents(); // 찍은 동영상의 경로를 가져와서 갤러리에 보여주게만 하는거(찍은 사진을 스캔)
-
-                filePath = mCurrentPhotoPath;
-                Log.i(Global.TAG, "filePath: " + filePath);
-
-                if (filePath != null) {
-                    // filePath(/storage/emulated/0/Movies/)를 변경해서 파일명.확장자 고객화면에 보여주기
-                    String[] splitFilePath = filePath.split("/");
-                    userSource = splitFilePath[splitFilePath.length - 1];
-                    Log.i(Global.TAG, "userSource: " + userSource);
-                    textSource.setText(userSource);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else if (requestCode == Global.REQ_VIDEO_CAPTURE && resultCode == Activity.RESULT_OK) {
-            // 카메라 촬영 결과처리 : 찍은 사진을 갤러리에 저장하기
-            try {
-                Log.i(Global.TAG, "startActivityForResult(takeContentsIntent, Global.REQ_VIDEO_CAPTURE) 결과처리");
-                galleryAddContents(); // 찍은 동영상의 경로를 가져와서 갤러리에 보여주게만 하는거(찍은 동영상을 스캔)
+                galleryAddContents(); // 찍은 사진, 동영상의 경로를 가져와서 갤러리에 보여주게만 하는거(찍은 사진, 동영상을 스캔)
 
                 filePath = mCurrentPhotoPath;
                 Log.i(Global.TAG, "filePath: " + filePath);
@@ -681,17 +662,4 @@ public class ContentsActivity extends AppCompatActivity {
         sendBroadcast(mediaScanIntent);
         Toast.makeText(this, "컨텐츠가 저장되었습니다", Toast.LENGTH_SHORT).show();
     }
-
-    
-/*
-    // source : 파일이름.확장자
-    // 안드로이드 기본 경로는 /storage/emulated/0/NuguCall
-    // 종합 경로 : /storage/emulated/0/NuguCall/"파일이름.확장자"
-    String filePath = Global.DEFAULT_PATH + File.separator + source;
-    // 파일 성질 알아내기 (image/png) (video/mp4)
-    String mimeType = URLConnection.guessContentTypeFromName(filePath);
-    // 슬래시 앞에 것 따오기
-    mimeType = mimeType.substring(0, mimeType.indexOf("/"));
-    File file = new File(filePath);
-*/
 }
