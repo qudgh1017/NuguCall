@@ -45,5 +45,5 @@ class Global {
     static final String INTENT_EXTRA_SOURCE = "INTENT_EXTRA_SOURCE";
     static final String INTENT_EXTRA_FILEPATH = "INTENT_EXTRA_FILEPATH";
 
-    static final int MAXIMUM_FILE_SIZE = 100*1024*1024;
+    static final int MAXIMUM_FILE_SIZE = 100*1024*1024;//100MB
 }

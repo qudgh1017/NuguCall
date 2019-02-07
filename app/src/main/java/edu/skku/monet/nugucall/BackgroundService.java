@@ -185,6 +185,8 @@ public class BackgroundService extends Service {
             vv_source = findViewById(R.id.vv_source);
             tv_text = findViewById(R.id.tv_text);
 
+            //이미지를 가로or세로 중 하나 꽉채워서 가운데로 정렬
+            iv_source.setScaleType(ImageView.ScaleType.FIT_CENTER);
             // 지나가는 애니메이션을 위해 필요
             tv_text.setSelected(true);
         }
@@ -235,7 +237,7 @@ public class BackgroundService extends Service {
                 case "image":
                     iv_source.setVisibility(View.VISIBLE);
                     // 이미지 띄워주는 라이브러리
-                    RequestOptions requestOptions = new RequestOptions().centerCrop().placeholder(R.drawable.icon);
+                    RequestOptions requestOptions = new RequestOptions().placeholder(R.drawable.icon);
                     Glide.with(getApplicationContext()).load(file).apply(requestOptions).into(iv_source);
                     break;
 
@@ -277,7 +279,7 @@ public class BackgroundService extends Service {
             windowManager.addView(callScreenLayout, callScreenLayoutParams);
 
             iv_source.setVisibility(View.VISIBLE);
-            RequestOptions requestOptions = new RequestOptions().centerCrop().placeholder(R.drawable.icon);
+            RequestOptions requestOptions = new RequestOptions().placeholder(R.drawable.icon);
             Glide.with(getApplicationContext()).load(R.drawable.icon).apply(requestOptions).into(iv_source);
         }
 
@@ -329,7 +331,7 @@ public class BackgroundService extends Service {
                 case "image":
                     iv_source.setVisibility(View.VISIBLE);
                     // 이미지 띄워주는 라이브러리
-                    RequestOptions requestOptions = new RequestOptions().centerCrop().placeholder(R.drawable.icon).error(R.mipmap.ic_launcher);
+                    RequestOptions requestOptions = new RequestOptions().placeholder(R.drawable.icon).error(R.mipmap.ic_launcher);
                     Glide.with(getApplicationContext()).load(file).apply(requestOptions).into(iv_source);
                     break;
 
