@@ -557,7 +557,6 @@ public class ContentsActivity extends AppCompatActivity {
         if (Environment.MEDIA_MOUNTED.equals(state)) {
 
             Intent takeContentsIntent = null;
-
             switch (req) {
                 case Global.REQ_IMAGE_CAPTURE:
                     // 사진을 찍기 위해 인텐트 MediaStore에 있는 ACTION_IMAGE_CAPTURE를 활용해서 가져온다
@@ -604,7 +603,6 @@ public class ContentsActivity extends AppCompatActivity {
             }
         } else {
             Log.i(Global.TAG, "저장공간에 접근 불가능");
-
             return;
         }
     }
@@ -662,4 +660,5 @@ public class ContentsActivity extends AppCompatActivity {
         sendBroadcast(mediaScanIntent);
         Toast.makeText(this, "컨텐츠가 저장되었습니다", Toast.LENGTH_SHORT).show();
     }
+
 }
